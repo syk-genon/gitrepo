@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT NECRO : 목적을 잃지 않는 사령군주 - 2D 레트로 도트 RPG</title>
+    <link rel="stylesheet" href="index.css?v=11">
+</head>
+<body>
+    <!-- 에러 디버그 로거 -->
+    <div id="debug-error-log" style="color: red; background: yellow; font-size: 14px; padding: 10px; position: fixed; top: 0; left: 0; z-index: 99999; display: none; width: 100%;"></div>
+    <script>
+        window.onerror = function(msg, url, line) {
+            var logDiv = document.getElementById('debug-error-log');
+            if (logDiv) {
+                logDiv.style.display = 'block';
+                logDiv.innerHTML += '<div>Error: ' + msg + ' at ' + url + ':' + line + '</div>';
+            }
+            return false;
+        };
+    </script>
+
+    <div id="app-container">
+
+        <!-- ============================================================= -->
+        <!-- SCREEN 1: START SCREEN (타이틀 화면) -->
+        <!-- ============================================================= -->
+        <section id="screen-start" class="game-screen active">
+            <div class="joseon-frame start-box">
+                <div style="font-size: 0.9rem; color: var(--neon-cyan); letter-spacing: 3px;">[ 웹소설 원작 16비트 도트 액션 RPG ]</div>
+                <h1 class="start-title">💀 목적을 잃지 않는 사령군주</h1>
+                <p class="start-subtitle">멸망과 차원문, 12대 직업과 14개 지역의 사령 대전쟁</p>
+
+                <!-- 12대 직업 아바타 썸네일 열람 -->
+                <div style="font-size: 0.78rem; color: var(--neon-gold); margin-top: 6px;">⚔️ 12대 플레이어블 클래스 (클릭하여 미리보기):</div>
+                <div class="start-classes-preview" id="startClassesIcons"></div>
+
+                <div class="start-actions">
+                    <button class="btn-pixel gold" style="font-size: 1.05rem; padding: 10px 24px;" onclick="startNewGamePrompt()">
+                        ⚔️ 새로운 여정 시작
+                    </button>
+                    <button class="btn-pixel green" id="btnContinueGame" style="font-size: 1.05rem; padding: 10px 24px;" onclick="continueSavedGame()">
+                        💾 이어하기 (자동 저장)
+                    </button>
+                    <button class="btn-pixel" id="btnSoundToggleStart" style="font-size: 0.9rem; padding: 10px 18px; color: var(--neon-cyan);" onclick="toggleSoundEngine()">
+                        🔊 소리: ON
+                    </button>
+                    <a href="display.html" class="btn-pixel" style="text-decoration: none; font-size: 0.9rem; padding: 10px 18px;">
+                        📜 1단계 전시관·도감
+                    </a>
+                </div>
+
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
+                    ※ 12대 직업 · 72종 스킬 마스터리 · 60종 신화 세트 · 36종 고유 유물 · 무한 회귀 영혼 각인 완비
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- SCREEN 2: CLASS SELECTION (직업 선택) -->
+        <!-- ============================================================= -->
+        <section id="screen-class-select" class="game-screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div>
+                    <h2 style="font-size: 1.8rem; color: var(--neon-gold);">⚔️ 플레이어블 클래스 선택</h2>
+                    <p style="font-size: 0.85rem; color: var(--neon-cyan);">원작 소설의 주역 5인방, 3대 군단장, 세계 10왕의 전투 양식을 계승하십시오.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-pixel" onclick="switchScreen('screen-start')">◀ 타이틀로</button>
+                    <button class="btn-pixel gold" id="btnConfirmClassSelection" onclick="confirmSelectedClass()">
+                        선택 완료 및 거점 입장 ▶
+                    </button>
+                </div>
+            </div>
+
+            <div class="class-select-grid" id="classSelectGrid"></div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- SCREEN 3: VILLAGE HUB (생존자 거점 - 을지로 안전지대) -->
+        <!-- ============================================================= -->
+        <section id="screen-hub" class="game-screen">
+            <!-- 상단 상태 표시줄 -->
+            <div class="hub-top-bar">
+                <div class="player-info-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img id="hubPlayerAvatar" src="assets/agents/agent_male_nemesis.png?v=10" style="width: 36px; height: 36px; object-fit: contain; border: 1px solid var(--neon-gold); background: #0c0806;">
+                        <div>
+                            <div style="font-size: 0.86rem; color: var(--neon-gold); font-weight: bold;" id="hubPlayerName">💀 사령군주 (Lv.1)</div>
+                            <div style="font-size: 0.7rem; color: var(--neon-cyan);" id="hubPlayerModel">최미남 (사령군주)</div>
+                        </div>
+                    </div>
+
+                    <div class="resource-badge">
+                        <span style="color: var(--neon-gold);">💰 마력석(골드):</span>
+                        <strong id="hubGoldText" style="color: #fff;">1,000</strong>
+                    </div>
+
+                    <div class="resource-badge">
+                        <span style="color: var(--neon-green);">🩸 회귀 차수:</span>
+                        <strong id="hubRegressionText" style="color: #fff;">0회차</strong>
+                    </div>
+
+                    <div class="resource-badge">
+                        <span style="color: var(--neon-pink);">⚔️ 전투력:</span>
+                        <strong id="hubCombatPowerText" style="color: var(--neon-pink);">1,250</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn-pixel" id="btnSoundToggleHub" style="font-size: 0.75rem; padding: 4px 10px; color: var(--neon-cyan);" onclick="toggleSoundEngine()">🔊 소리: ON</button>
+                    <button class="btn-pixel" style="font-size: 0.75rem; padding: 4px 10px;" onclick="saveGameState(true)">💾 수동 저장</button>
+                    <button class="btn-pixel pink" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openRegressionModal()">🔄 회귀 제단</button>
+                    <a href="display.html" class="btn-pixel" style="text-decoration: none; font-size: 0.75rem; padding: 4px 10px;">📜 도감</a>
+                    <button class="btn-pixel" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchScreen('screen-start')">🚪 나가기</button>
+                </div>
+            </div>
+
+            <!-- 허브 네비게이션 탭 -->
+            <div class="hub-nav-tabs">
+                <button class="btn-pixel hub-tab-btn active" data-tab="tab-gates" onclick="switchHubTab('tab-gates')">
+                    🚪 차원문 원정 (1~14지역)
+                </button>
+                <button class="btn-pixel hub-tab-btn" data-tab="tab-blacksmith" onclick="switchHubTab('tab-blacksmith')">
+                    🔨 강두호 대장간 (장비 강화)
+                </button>
+                <button class="btn-pixel hub-tab-btn" data-tab="tab-skills" onclick="switchHubTab('tab-skills')">
+                    📜 스킬 성소 (72종 비급서)
+                </button>
+                <button class="btn-pixel hub-tab-btn" data-tab="tab-inventory" onclick="switchHubTab('tab-inventory')">
+                    🎒 배낭 & 신화 세트 (60종)
+                </button>
+                <button class="btn-pixel hub-tab-btn" data-tab="tab-shop" onclick="switchHubTab('tab-shop')">
+                    🧪 비약 상점 (물약)
+                </button>
+                <button class="btn-pixel hub-tab-btn" data-tab="tab-altar" onclick="switchHubTab('tab-altar')">
+                    🔄 영혼 각인의 제단 (특성/재능)
+                </button>
+            </div>
+
+            <!-- 허브 메인 컨텐츠 영역 -->
+            <div class="hub-body">
+
+                <!-- TAB 1: 차원문 원정 (GATE EXPEDITION) -->
+                <div class="hub-panel active" id="tab-gates">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div>
+                            <h3 style="font-size: 1.25rem; color: var(--neon-gold);">🚪 차원문 원정 선택 (전 14개 지역)</h3>
+                            <p style="font-size: 0.78rem; color: var(--text-muted);">순수 야생 자연이 보존된 차원문 내부를 돌파하고 6웨이브 보스를 정복하십시오.</p>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--neon-cyan);">
+                            진행 가능 지역: <strong id="hubMaxRegionUnlockedText" style="color: var(--neon-gold);">지역 1 (을지로 잔해)</strong>
+                        </div>
+                    </div>
+                    <div class="gates-map-grid" id="gatesMapGrid"></div>
+                </div>
+
+                <!-- TAB 2: 강두호 대장간 (BLACKSMITH) -->
+                <div class="hub-panel" id="tab-blacksmith">
+                    <div class="joseon-frame" style="max-width: 900px; margin: 0 auto; padding: 24px;">
+                        <h3 style="font-size: 1.3rem; color: var(--neon-gold); margin-bottom: 6px;">🔨 강두호 대장간 (장비 제련 및 강화)</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+                            을지로의 전설적 대장장이 강두호가 장비의 능력치를 한계까지 끌어올립니다. (최대 +15강)
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <!-- 좌측: 현재 장착 중인 장비 목록 -->
+                            <div class="hanji-card">
+                                <div style="font-size: 0.85rem; color: var(--neon-cyan); margin-bottom: 8px;">강화할 장비 선택:</div>
+                                <div id="blacksmithEquipList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                            </div>
+
+                            <!-- 우측: 강화 작업대 -->
+                            <div class="hanji-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; min-height: 280px;">
+                                <div id="forgeTargetIcon" style="width: 80px; height: 80px; border: 2px solid var(--border-wood-light); background: #0c0806; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">장비 미선택</span>
+                                </div>
+                                <div id="forgeTargetName" style="font-size: 1rem; color: var(--neon-gold); font-weight: bold;">-</div>
+                                <div id="forgeStatPreview" style="font-size: 0.8rem; color: var(--neon-green);">-</div>
+                                <div id="forgeCostPreview" style="font-size: 0.78rem; color: var(--neon-cyan);">비용: -</div>
+
+                                <button class="btn-pixel gold" id="btnDoEnhance" style="font-size: 0.95rem; padding: 8px 24px;" onclick="performEnhancement()">
+                                    🔨 망치질 실행 (+1 강화)
+                                </button>
+                                <div id="forgeResultMsg" style="font-size: 0.78rem; height: 18px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: 스킬 성소 (SKILL SANCTUARY) -->
+                <div class="hub-panel" id="tab-skills">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div>
+                            <h3 style="font-size: 1.25rem; color: var(--neon-gold);">📜 스킬 성소 (크로스 스킬 마스터리)</h3>
+                            <p style="font-size: 0.78rem; color: var(--text-muted);">12개 직업 72종 고유 스킬 중 4개 액티브 + 1개 궁극기를 자유롭게 교체하여 장착하십시오.</p>
+                        </div>
+                    </div>
+
+                    <!-- 현재 장착 슬롯 5칸 -->
+                    <div class="hanji-card" style="margin-bottom: 16px; padding: 14px;">
+                        <div style="font-size: 0.85rem; color: var(--neon-gold); margin-bottom: 10px;">전투 장착 슬롯 (단축키 Q, W, E, R, SPACE):</div>
+                        <div style="display: flex; gap: 14px; justify-content: center;" id="equippedSkillsBar"></div>
+                    </div>
+
+                    <!-- 해금된 72개 스킬 라이브러리 -->
+                    <div class="hanji-card" style="padding: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 0.85rem; color: var(--neon-cyan);">해금된 스킬 도감 (클릭 시 선택된 슬롯에 장착):</span>
+                            <div style="display: flex; gap: 4px;" id="skillFilterClassTabs"></div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto;" id="skillLibraryGrid"></div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: 배낭 & 신화 세트 (INVENTORY) -->
+                <div class="hub-panel" id="tab-inventory">
+                    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px;">
+                        <!-- 좌측: 5부위 장착 현황 & 세트 효과 -->
+                        <div class="hanji-card">
+                            <h4 style="font-size: 1rem; color: var(--neon-gold); margin-bottom: 10px;">🛡️ 현재 착용 중인 장비 (5부위):</h4>
+                            <div id="equippedGearGrid" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+                            <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border-wood-light);">
+                                <div style="font-size: 0.85rem; color: var(--neon-cyan); margin-bottom: 4px;">🌟 활성화된 세트 시너지:</div>
+                                <div id="activeSetBonusText" style="font-size: 0.78rem; color: var(--neon-green); line-height: 1.4;">-</div>
+                            </div>
+                        </div>
+
+                        <!-- 우측: 보유 중인 고유(Unique) 유물 및 전리품 보관함 -->
+                        <div class="hanji-card">
+                            <h4 style="font-size: 1rem; color: var(--neon-pink); margin-bottom: 10px;">💎 보유 고유 유물 & 인벤토리 (36종 빌드 체인저):</h4>
+                            <div id="inventoryUniqueList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; max-height: 480px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: 비약 상점 (SHOP) -->
+                <div class="hub-panel" id="tab-shop">
+                    <div class="joseon-frame" style="max-width: 800px; margin: 0 auto; padding: 24px;">
+                        <h3 style="font-size: 1.3rem; color: var(--neon-gold); margin-bottom: 6px;">🧪 거점 비약 상점 (체력·마력 보급)</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
+                            차원문 원정에 필요한 생존 비약을 골드로 구매하여 가방에 보관합니다. (각 물약 최대 10개)
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="hanji-card" style="text-align: center; padding: 18px;">
+                                <div style="font-size: 2.4rem; margin-bottom: 8px;">🧪</div>
+                                <h4 style="font-size: 1.05rem; color: var(--neon-pink); margin-bottom: 6px;">생명수 회복 비약 (HP)</h4>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">즉시 체력 +600 회복 (전투 중 단축키 1)</div>
+                                <div style="font-size: 0.82rem; color: var(--neon-gold); margin-bottom: 12px;">가격: 200 마력석 / 보유: <strong id="shopHpPotionCount" style="color:#fff;">0</strong>/10</div>
+                                <button class="btn-pixel pink" style="width: 100%;" onclick="buyPotion('hp')">비약 구매 (200 골드)</button>
+                            </div>
+
+                            <div class="hanji-card" style="text-align: center; padding: 18px;">
+                                <div style="font-size: 2.4rem; margin-bottom: 8px;">⚗️</div>
+                                <h4 style="font-size: 1.05rem; color: var(--neon-cyan); margin-bottom: 6px;">청록 마나 영약 (MP)</h4>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">즉시 마나 +400 회복 (전투 중 단축키 2)</div>
+                                <div style="font-size: 0.82rem; color: var(--neon-gold); margin-bottom: 12px;">가격: 150 마력석 / 보유: <strong id="shopMpPotionCount" style="color:#fff;">0</strong>/10</div>
+                                <button class="btn-pixel gold" style="width: 100%;" onclick="buyPotion('mp')">영약 구매 (150 골드)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: 회귀 제단 (ALTAR) -->
+                <div class="hub-panel" id="tab-altar">
+                    <div class="joseon-frame" style="max-width: 850px; margin: 0 auto; padding: 24px;">
+                        <h3 style="font-size: 1.3rem; color: var(--neon-gold); margin-bottom: 6px;">🔄 회귀와 영혼 각인의 제단</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+                            사망하거나 의도적으로 회귀할 때마다 영혼에 특성과 재능이 새겨집니다. 만렙(Lv.10) 도달 시 영혼 각인 전용칸이 개방됩니다.
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+                            <div class="hanji-card">
+                                <h4 style="font-size: 0.9rem; color: var(--neon-green); margin-bottom: 8px;">계승된 신체 특성 (Traits):</h4>
+                                <div id="altarTraitsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                            </div>
+                            <div class="hanji-card">
+                                <h4 style="font-size: 0.9rem; color: var(--neon-purple); margin-bottom: 8px;">계승된 회귀 재능 (Talents):</h4>
+                                <div id="altarTalentsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="hanji-card" style="border-color: var(--neon-gold); text-align: center; padding: 14px;">
+                            <div style="font-size: 0.9rem; color: var(--neon-gold); margin-bottom: 4px;">🌟 영혼 각인 전용 재능칸 (Master Soul Slot):</div>
+                            <div id="altarMasterSoulStatus" style="font-size: 0.8rem; color: var(--text-muted);">미해금 (최초 Lv.10 특성/재능 달성 시 개방)</div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn-pixel pink" style="font-size: 1rem; padding: 10px 28px;" onclick="openRegressionModal()">
+                                🔄 제단에서 의도적 회귀(Regression) 실행
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- SCREEN 4: BATTLE ARENA (실시간 횡스크롤 전투) -->
+        <!-- ============================================================= -->
+        <section id="screen-battle" class="game-screen">
+            <!-- 전투 상단 헤더 -->
+            <div class="battle-header-bar">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div style="font-size: 0.9rem; color: var(--neon-gold);" id="battleRegionTitleText">
+                        🚪 지역 1: 서울 지하철 을지로 잔해
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--neon-pink); background: rgba(0,0,0,0.7); padding: 3px 8px; border: 1px solid var(--neon-pink);" id="battleWaveProgressBadge">
+                        WAVE 1/6 (척후병)
+                    </div>
+                    <!-- 실시간 전투 통계 트래커 -->
+                    <div class="battle-stats-tracker" id="battleStatsTracker">
+                        <span style="color: var(--neon-cyan);">⚡ DPS: <strong id="battleLiveDpsText">0</strong></span>
+                        <span style="color: var(--neon-gold);">💰 획득: <strong id="battleSessionGoldText">0</strong>G</span>
+                        <span style="color: var(--neon-green);">💀 처치: <strong id="battleSessionKillsText">0</strong></span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn-pixel" id="btnSoundToggleBattle" style="font-size: 0.72rem; padding: 3px 8px; color: var(--neon-cyan);" onclick="toggleSoundEngine()">
+                        🔊 ON
+                    </button>
+                    <button class="btn-pixel" id="btnBattleSpeed" style="font-size: 0.72rem; padding: 3px 8px; color: var(--neon-gold);" onclick="toggleBattleSpeed()">
+                        ⚡ 1x
+                    </button>
+                    <button class="btn-pixel" id="btnAutoBattle" style="font-size: 0.72rem; padding: 3px 8px; color: var(--neon-green);" onclick="toggleAutoBattle()">
+                        🤖 자동: ON
+                    </button>
+                    <button class="btn-pixel" id="btnAutoNextRegion" style="font-size: 0.72rem; padding: 3px 8px; color: var(--neon-purple);" onclick="toggleAutoNextRegion()">
+                        🔄 연속 돌파: OFF
+                    </button>
+                    <button class="btn-pixel" style="font-size: 0.72rem; padding: 3px 8px;" onclick="retreatToVillage()">
+                        🏘️ 귀환
+                    </button>
+                </div>
+            </div>
+
+            <!-- 중앙 전투 뷰포트 (2400x360 순수 야생 파노라마 + 프롭 레이어) -->
+            <div class="battle-stage-viewport" id="battleStageViewport">
+                <!-- 프롭 레이어 -->
+                <div class="battle-props-layer" id="battlePropsLayer"></div>
+
+                <!-- VFX 및 타격 오버레이 -->
+                <div class="battle-vfx-overlay" id="battleVfxOverlay"></div>
+
+                <!-- 영웅 및 소환수 대열 (좌측) -->
+                <div class="hero-battalion-box" id="heroBattalionBox">
+                    <!-- 미니언 소환수 도열 -->
+                    <div class="hero-minions-row" id="heroMinionsRow"></div>
+                    <!-- 영웅 본체 -->
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <img id="battleHeroActorImg" class="hero-sprite-actor" src="assets/agents/agent_male_nemesis.png?v=10">
+                        <div id="battleHeroNameplate" style="font-size: 0.62rem; color: var(--neon-green); background: rgba(0,0,0,0.85); border: 1px solid var(--neon-green); padding: 1px 4px; margin-top: 2px;">사령군주</div>
+                    </div>
+                </div>
+
+                <!-- 적 괴수 (우측, Facing Left scaleX(-1)) -->
+                <div class="enemy-battalion-box" id="enemyBattalionBox">
+                    <div style="background: rgba(10, 7, 5, 0.9); border: 1px solid var(--border-ink); padding: 3px 8px; margin-bottom: 6px; text-align: center; min-width: 160px;">
+                        <div id="battleEnemyRoleName" style="font-size: 0.68rem; color: var(--neon-cyan);">WAVE 1 괴수</div>
+                        <div style="width: 100%; height: 9px; background: #260a0a; border: 1px solid #000; margin-top: 2px; overflow: hidden;">
+                            <div id="battleEnemyHpBarInner" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ff2a6d, #ffd000); transition: width 0.12s;"></div>
+                        </div>
+                        <div id="battleEnemyHpText" style="font-size: 0.62rem; color: #fff; margin-top: 1px;">HP: 100%</div>
+                    </div>
+                    <img id="battleEnemySpriteImg" class="enemy-monster-sprite" src="assets/monsters/m_1_1.png?v=11" onclick="onEnemyClick()">
+                    <div id="battleEnemyShadow" class="enemy-shadow"></div>
+                </div>
+            </div>
+
+            <!-- 하단 커맨드 & 스킬 컨트롤 바 -->
+            <div class="battle-control-bar">
+                <!-- HP / MP 게이지 -->
+                <div class="gauge-group">
+                    <div>
+                        <div style="font-size: 0.68rem; color: var(--neon-pink); margin-bottom: 2px;">HP (체력)</div>
+                        <div class="bar-outer">
+                            <div class="bar-inner hp" id="battlePlayerHpBar" style="width: 100%;"></div>
+                            <div class="bar-text" id="battlePlayerHpText">1,000 / 1,000</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.68rem; color: var(--neon-cyan); margin-bottom: 2px;">MP (마력)</div>
+                        <div class="bar-outer">
+                            <div class="bar-inner mp" id="battlePlayerMpBar" style="width: 100%;"></div>
+                            <div class="bar-text" id="battlePlayerMpText">500 / 500</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5칸 스킬 슬롯 (Q, W, E, R, SPACE) -->
+                <div class="skills-slots-row" id="battleSkillsSlotsRow"></div>
+
+                <!-- 물약 퀵슬롯 -->
+                <div style="display: flex; gap: 8px;">
+                    <div class="skill-slot-btn" onclick="usePotion('hp')" title="체력 물약 (단축키 1)">
+                        <span class="skill-hotkey-badge">1</span>
+                        <div style="font-size: 1.4rem;">🧪</div>
+                        <span id="potionHpCount" style="font-size: 0.65rem; color: var(--neon-pink);">x5</span>
+                    </div>
+                    <div class="skill-slot-btn" onclick="usePotion('mp')" title="마나 물약 (단축키 2)">
+                        <span class="skill-hotkey-badge">2</span>
+                        <div style="font-size: 1.4rem;">⚗️</div>
+                        <span id="potionMpCount" style="font-size: 0.65rem; color: var(--neon-cyan);">x5</span>
+                    </div>
+                </div>
+
+                <!-- 전투 실시간 로그 티커 -->
+                <div class="battle-log-ticker" id="battleLogTicker">
+                    <div class="battle-log-line">▶ 전투에 진입했습니다. 공격 태세를 취하십시오.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- MODAL 1: VICTORY & LOOT REWARD (승리 및 전리품) -->
+        <!-- ============================================================= -->
+        <div class="modal-overlay" id="modal-victory">
+            <div class="joseon-frame modal-content-box" style="text-align: center;">
+                <h2 style="font-size: 1.8rem; color: var(--neon-gold); text-shadow: 0 0 16px rgba(255,208,0,0.6);">
+                    🏆 차원문 완전 정복!
+                </h2>
+                <div style="font-size: 0.85rem; color: var(--neon-cyan);" id="victoryRegionName">
+                    지역 1: 서울 지하철 을지로 잔해 클리어
+                </div>
+
+                <div class="hanji-card" style="padding: 12px; margin: 10px 0; text-align: left;">
+                    <div style="font-size: 0.85rem; color: var(--neon-gold); margin-bottom: 8px;">획득한 전리품:</div>
+                    <div style="font-size: 0.8rem; line-height: 1.6;">
+                        💰 획득 마력석(골드): <strong id="lootGoldText" style="color: #fff;">+3,500</strong><br>
+                        ✨ 획득 경험치: <strong id="lootExpText" style="color: var(--neon-green);">+1,200 EXP</strong>
+                    </div>
+                    <div class="loot-rewards-grid" id="lootItemsGrid"></div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button class="btn-pixel" onclick="closeVictoryModal(false)">🏘️ 거점 마을 귀환</button>
+                    <button class="btn-pixel gold" id="btnNextRegionExpedition" onclick="closeVictoryModal(true)">🚪 다음 차원문 진격 ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- MODAL 2: DEFEAT & REGRESSION TRIGGER (사망 및 회귀) -->
+        <!-- ============================================================= -->
+        <div class="modal-overlay" id="modal-defeat">
+            <div class="joseon-frame modal-content-box" style="text-align: center; border-color: var(--neon-pink);">
+                <h2 style="font-size: 1.8rem; color: var(--neon-pink); text-shadow: 0 0 16px rgba(255,42,109,0.8);">
+                    💀 전 사 (滅 亡)
+                </h2>
+                <p style="font-size: 0.85rem; color: #d6c7b2; line-height: 1.5;">
+                    차원문의 맹렬한 기운 앞에 쓰러졌습니다...<br>
+                    그러나 사령군주의 영혼은 소멸하지 않고 다시 <strong>회귀의 굴레</strong>로 이끌립니다.
+                </p>
+
+                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 10px;">
+                    <button class="btn-pixel pink" style="font-size: 1rem; padding: 10px 24px;" onclick="triggerDefeatRegression()">
+                        🔄 영혼을 바치고 회귀하기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- MODAL 3: REGRESSION CEREMONY (회귀 의식 및 계승) -->
+        <!-- ============================================================= -->
+        <div class="modal-overlay" id="modal-regression">
+            <div class="joseon-frame modal-content-box">
+                <h3 style="color: var(--neon-gold); font-size: 1.3rem;">🔄 회귀(Regression) 영혼 각인 의식</h3>
+                <p style="font-size: 0.78rem; color: #d6c7b2; line-height: 1.4;">
+                    회귀 시 소지 골드와 일반 장비는 전량 소멸합니다.<br>
+                    대신 이번 회차에서 영구히 유지할 <strong>신체 특성 1개와 회귀 재능 1개</strong>를 선택하십시오.<br>
+                    <span style="color: var(--neon-cyan);">(동일 항목 선택 시 슬롯 소모 없이 레벨(Lv)이 올라 +50%p씩 효율이 증가합니다)</span>
+                </p>
+
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--neon-green); display: block; margin-bottom: 4px;">신체 특성 (Trait) 선택:</label>
+                    <select id="selectRegressionTrait" style="width: 100%; background: #100c09; color: #fff; border: 2px solid var(--border-ink); padding: 7px; font-family: var(--font-pixel);"></select>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--neon-purple); display: block; margin-bottom: 4px;">회귀 재능 (Talent) 선택:</label>
+                    <select id="selectRegressionTalent" style="width: 100%; background: #100c09; color: #fff; border: 2px solid var(--border-ink); padding: 7px; font-family: var(--font-pixel);"></select>
+                </div>
+
+                <div id="inheritRelicRow" style="display: none; margin-top: 8px;">
+                    <label style="font-size: 0.8rem; color: var(--neon-gold); display: block; margin-bottom: 4px;">🕰️ 태엽 회중시계 계승 유물 선택:</label>
+                    <select id="selectInheritRelic" style="width: 100%; background: #100c09; color: #fff; border: 2px solid var(--border-ink); padding: 7px; font-family: var(--font-pixel);"></select>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;">
+                    <button class="btn-pixel" onclick="closeRegressionModal()">취소</button>
+                    <button class="btn-pixel gold" onclick="executeRegression()">맹세하고 회귀 실행</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- MODAL 4: OFFLINE IDLE REWARD (오프라인 사령 원정 방치 보상) -->
+        <!-- ============================================================= -->
+        <div class="modal-overlay" id="modal-offline-reward">
+            <div class="joseon-frame modal-content-box" style="text-align: center; max-width: 480px;">
+                <h3 style="color: var(--neon-gold); font-size: 1.4rem; text-shadow: 0 0 14px rgba(255,208,0,0.6);">
+                    📜 사령 원정대 복귀 보고서
+                </h3>
+                <p style="font-size: 0.82rem; color: var(--neon-cyan); margin-top: 4px;">
+                    주군께서 자리를 비우신 동안 사령 부하들이 차원문을 정찰하여 전리품을 수확했습니다!
+                </p>
+
+                <div class="hanji-card" style="padding: 16px; margin: 16px 0; text-align: left; line-height: 1.8;">
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        ⏱️ 탐색 방치 시간: <strong id="offlineDurationText" style="color: #fff;">0시간 0분</strong> (최대 12시간)
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        🚪 최고 개척 지역: <strong id="offlineMaxRegionText" style="color: var(--neon-cyan);">지역 1</strong>
+                    </div>
+                    <div style="height: 1px; background: var(--border-wood); margin: 8px 0;"></div>
+                    <div style="font-size: 0.95rem; color: var(--neon-gold);">
+                        💰 수확 마력석(골드): <strong id="offlineGoldText" style="color: #fff;">+0</strong> G
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--neon-green);">
+                        ✨ 축적 영혼 경험치: <strong id="offlineExpText" style="color: #fff;">+0</strong> EXP
+                    </div>
+                </div>
+
+                <button class="btn-pixel gold" style="font-size: 1.05rem; padding: 9px 32px;" onclick="claimOfflineRewards()">
+                    🎁 전리품 전량 수령
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="display_data.js?v=11"></script>
+    <script src="index.js?v=11"></script>
+</body>
+</html>

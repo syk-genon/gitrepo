@@ -1,0 +1,862 @@
+/* =========================================================================
+   PROJECT NECRO: 목적을 잃지 않는 사령군주 - 2D 도트 RPG 마스터 스타일시트 (index.css)
+   조선 전통 목판·한지·창살(亞/완자문) + 황동 두석 + 다크 판타지 네온 테마
+   ========================================================================= */
+
+@import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/NeoDunggeunmo.css');
+
+:root {
+    /* 조선 고목판 & 음영 한지 베이스 */
+    --bg-wood-dark: #0c0908;
+    --bg-wood-panel: #18120e;
+    --bg-hanji-dark: #231b15;
+    --bg-hanji-card: #2c221a;
+
+    /* 목판 & 황동 두석 테두리 */
+    --border-ink: #050403;
+    --border-wood: #543b28;
+    --border-wood-light: #7e5a3e;
+    --border-brass: #d4a338;
+
+    /* 네온 포인트 컬러 */
+    --neon-gold: #ffd000;
+    --neon-cyan: #00f0ff;
+    --neon-green: #00ffaa;
+    --neon-purple: #c850ff;
+    --neon-pink: #ff2a6d;
+    --neon-red: #ff3344;
+    --neon-blue: #3388ff;
+
+    --text-ivory: #f5ede2;
+    --text-muted: #b8a692;
+    --font-pixel: 'NeoDunggeunmo', monospace, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-wood-dark);
+    background-image: radial-gradient(circle at 50% 20%, #201712 0%, #0c0908 100%);
+    color: var(--text-ivory);
+    font-family: var(--font-pixel);
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+/* 9-Slice 전통 목판 대청 패널 프레임 */
+.joseon-frame {
+    border: 26px solid transparent;
+    border-image: url('assets/ui/ui_joseon_frame_cropped.png?v=10') 135 160 135 160 fill / 26px 32px / 0 round;
+    background: linear-gradient(180deg, rgba(16, 12, 10, 0.95), rgba(12, 9, 8, 0.98)),
+                url('assets/ui/ui_hanji_center_tile.png?v=10') repeat center / 256px;
+    box-shadow: 0 10px 0 var(--border-ink), 0 14px 28px rgba(0, 0, 0, 0.9);
+}
+
+/* 9-Slice 소형 한지 족자/창살 카드 프레임 */
+.hanji-card {
+    border: 14px solid transparent;
+    border-image: url('assets/ui/ui_hanji_card_cropped.png?v=10') 155 155 155 155 fill / 14px / 0 round;
+    background-color: #16110d;
+    box-shadow: 4px 4px 0 var(--border-ink);
+}
+
+/* 픽셀 버튼 (Forager 통통 튀는 버튼) */
+.btn-pixel {
+    background: #1e1713;
+    border: 2px solid var(--border-ink);
+    box-shadow: inset 0 0 0 1px var(--border-wood-light), 3px 3px 0 var(--border-ink);
+    color: var(--text-ivory);
+    font-family: var(--font-pixel);
+    font-size: 0.85rem;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.1s ease, color 0.1s ease, box-shadow 0.08s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-pixel:hover {
+    transform: translate(-1px, -2px);
+    box-shadow: inset 0 0 0 1px var(--neon-cyan), 4px 5px 0 var(--border-ink);
+    color: var(--neon-cyan);
+    background: #281e18;
+}
+
+.btn-pixel:active {
+    transform: translate(2px, 2px);
+    box-shadow: inset 0 0 0 1px var(--border-wood), 1px 1px 0 var(--border-ink);
+}
+
+.btn-pixel.gold {
+    color: var(--neon-gold);
+    border-color: var(--border-brass);
+    box-shadow: inset 0 0 0 1px var(--neon-gold), 3px 3px 0 var(--border-ink);
+}
+.btn-pixel.gold:hover {
+    background: #2e2410;
+    box-shadow: inset 0 0 0 1px #fff, 4px 5px 0 var(--border-ink), 0 0 14px rgba(255, 208, 0, 0.5);
+}
+
+.btn-pixel.green {
+    color: var(--neon-green);
+    border-color: #00aa66;
+    box-shadow: inset 0 0 0 1px var(--neon-green), 3px 3px 0 var(--border-ink);
+}
+.btn-pixel.green:hover {
+    background: #10281c;
+    box-shadow: inset 0 0 0 1px #fff, 4px 5px 0 var(--border-ink), 0 0 14px rgba(0, 255, 170, 0.5);
+}
+
+.btn-pixel.pink {
+    color: var(--neon-pink);
+    border-color: #cc1144;
+    box-shadow: inset 0 0 0 1px var(--neon-pink), 3px 3px 0 var(--border-ink);
+}
+.btn-pixel.pink:hover {
+    background: #2e1018;
+    box-shadow: inset 0 0 0 1px #fff, 4px 5px 0 var(--border-ink), 0 0 14px rgba(255, 42, 109, 0.5);
+}
+
+.btn-pixel.active {
+    background: #3a2a1e;
+    color: var(--neon-gold);
+    box-shadow: inset 0 0 0 2px var(--neon-gold), 2px 2px 0 var(--border-ink);
+}
+
+/* 화면 전환 컨테이너 */
+#app-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-screen {
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    inset: 0;
+    background-color: var(--bg-wood-dark);
+}
+
+.game-screen.active {
+    display: flex;
+}
+
+/* =========================================================================
+   1. START SCREEN
+   ========================================================================= */
+#screen-start {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #261a12 0%, #0c0806 80%),
+                url('assets/ui/regions/battle_pano_1.png?v=11') center / cover no-repeat;
+    background-blend-mode: multiply;
+}
+
+.start-box {
+    width: 900px;
+    max-width: 92vw;
+    padding: 36px 42px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.start-title {
+    font-size: 2.8rem;
+    color: var(--neon-gold);
+    text-shadow: 4px 4px 0 var(--border-ink), 0 0 22px rgba(255, 208, 0, 0.5);
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.start-subtitle {
+    font-size: 1.05rem;
+    color: var(--neon-cyan);
+    text-shadow: 2px 2px 0 var(--border-ink);
+}
+
+.start-classes-preview {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 780px;
+    margin: 10px 0;
+}
+
+.start-class-avatar {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--border-wood-light);
+    background: #140e0b;
+    padding: 3px;
+    box-shadow: 2px 2px 0 var(--border-ink);
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+}
+
+.start-class-avatar:hover {
+    transform: scale(1.15);
+    border-color: var(--neon-gold);
+}
+
+.start-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+/* =========================================================================
+   2. CLASS SELECTION SCREEN
+   ========================================================================= */
+#screen-class-select {
+    padding: 24px 32px;
+    overflow-y: auto;
+}
+
+.class-select-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.class-card {
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #18120e;
+}
+
+.class-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 6px 0 var(--border-ink), 0 0 16px rgba(0, 240, 255, 0.35);
+}
+
+.class-card.selected {
+    border-color: var(--neon-gold);
+    box-shadow: 4px 6px 0 var(--border-ink), 0 0 20px rgba(255, 208, 0, 0.6);
+    background: #241a12;
+}
+
+.class-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.class-card-sprite {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    background: #0d0907;
+    border: 2px solid var(--border-ink);
+    padding: 4px;
+}
+
+/* =========================================================================
+   3. VILLAGE HUB SCREEN
+   ========================================================================= */
+#screen-hub {
+    display: flex;
+    flex-direction: column;
+}
+
+.hub-top-bar {
+    height: 52px;
+    background: #120c09;
+    border-bottom: 3px solid var(--border-ink);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 50;
+}
+
+.player-info-group {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.resource-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    background: #1d1510;
+    padding: 4px 10px;
+    border: 2px solid var(--border-ink);
+    box-shadow: inset 0 0 0 1px var(--border-wood-light);
+}
+
+.hub-nav-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 10px 24px 0 24px;
+    background: #16100c;
+    border-bottom: 2px solid var(--border-wood);
+}
+
+.hub-tab-btn {
+    padding: 9px 20px;
+    font-size: 0.88rem;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+}
+
+.hub-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    position: relative;
+}
+
+.hub-panel {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.hub-panel.active {
+    display: block;
+}
+
+/* =========================================================================
+   GATE EXPEDITION MAP (지역 & 차원문 선택)
+   ========================================================================= */
+.gates-map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.gate-card {
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.gate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 6px 0 var(--border-ink), 0 0 18px rgba(255, 208, 0, 0.4);
+}
+
+.gate-tier-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    border: 1px solid currentColor;
+    margin-bottom: 6px;
+}
+
+/* =========================================================================
+   4. BATTLE SCREEN (실제 횡스크롤 전투 필드)
+   ========================================================================= */
+#screen-battle {
+    display: flex;
+    flex-direction: column;
+    background: #0a0705;
+}
+
+.battle-header-bar {
+    height: 48px;
+    background: #120c09;
+    border-bottom: 3px solid var(--border-ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 40;
+}
+
+.battle-stage-viewport {
+    flex: 1;
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+    background-size: auto 100%;
+    background-position: 0% center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    transition: background-position 0.9s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.battle-props-layer {
+    position: absolute;
+    inset: 0;
+    background-size: auto 100%;
+    background-position: 0% center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 5;
+    transition: background-position 0.9s cubic-bezier(0.2, 0.9, 0.3, 1);
+    animation: propGroundedBreath 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes propGroundedBreath {
+    0% { transform: scale(1.0) translateY(0); opacity: 0.96; }
+    50% { transform: scale(1.006) translateY(0); opacity: 1; }
+    100% { transform: scale(1.0) translateY(0); opacity: 0.96; }
+}
+
+/* 전투 필드 아군 영역 (Hero & Minions) */
+.hero-battalion-box {
+    position: absolute;
+    bottom: 22px;
+    left: 45px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 12;
+    transition: transform 0.4s ease-out;
+}
+
+.hero-sprite-actor {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    transform: scaleX(1);
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.95));
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.hero-minions-row {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+.minion-unit {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    animation: minionBob 1.6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.8));
+}
+
+@keyframes minionBob {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+}
+
+/* 적 몬스터 영역 */
+.enemy-battalion-box {
+    position: absolute;
+    bottom: 22px;
+    right: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 14;
+    transition: bottom 0.3s ease, right 0.3s ease;
+}
+
+.enemy-monster-sprite {
+    width: 145px;
+    height: 145px;
+    object-fit: contain;
+    transform: scaleX(-1);
+    image-rendering: pixelated;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95));
+    cursor: pointer;
+    transition: transform 0.12s, filter 0.12s;
+}
+
+.enemy-monster-sprite:hover {
+    filter: drop-shadow(0 0 14px var(--neon-pink)) drop-shadow(0 4px 12px rgba(0,0,0,0.95));
+}
+
+.enemy-shadow {
+    width: 110px;
+    height: 16px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 75%);
+    border-radius: 50%;
+    margin-top: -6px;
+    pointer-events: none;
+}
+
+.floating-monster {
+    animation: floatingMonster 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes floatingMonster {
+    0% { transform: scaleX(-1) translateY(0); }
+    100% { transform: scaleX(-1) translateY(-14px); }
+}
+
+/* VFX 및 타격 이펙트 오버레이 */
+.battle-vfx-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 25;
+    overflow: hidden;
+}
+
+/* 플로팅 데미지 텍스트 */
+.damage-floater {
+    position: absolute;
+    font-family: var(--font-pixel);
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+    pointer-events: none;
+    animation: damageFloat 0.85s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    z-index: 30;
+}
+
+@keyframes damageFloat {
+    0% { transform: translateY(0) scale(0.6); opacity: 0; }
+    20% { transform: translateY(-16px) scale(1.3); opacity: 1; }
+    80% { transform: translateY(-42px) scale(1.0); opacity: 0.9; }
+    100% { transform: translateY(-60px) scale(0.85); opacity: 0; }
+}
+
+/* 화면 역경직 쉐이크 */
+.screen-shake {
+    animation: shakeAnim 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shakeAnim {
+    10%, 90% { transform: translate3d(-3px, 0, 0); }
+    20%, 80% { transform: translate3d(5px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* 하단 전투 조작 바 (HP, MP, 스킬 4+1칸, 물약) */
+.battle-control-bar {
+    height: 120px;
+    background: #140d0a;
+    border-top: 3px solid var(--border-ink);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    z-index: 35;
+    gap: 20px;
+}
+
+.gauge-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 220px;
+}
+
+.bar-outer {
+    height: 18px;
+    background: #1b120d;
+    border: 2px solid var(--border-ink);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.bar-inner {
+    height: 100%;
+    transition: width 0.15s ease-out;
+}
+
+.bar-inner.hp {
+    background: linear-gradient(90deg, #bb1133, #ff3355);
+}
+
+.bar-inner.mp {
+    background: linear-gradient(90deg, #1155cc, #00d0ff);
+}
+
+.bar-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* 스킬 슬롯 바 (1~4 액티브 + 5 궁극기) */
+.skills-slots-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.skill-slot-btn {
+    width: 66px;
+    height: 66px;
+    background: #1d1510;
+    border: 2px solid var(--border-ink);
+    box-shadow: inset 0 0 0 1px var(--border-wood-light), 3px 3px 0 var(--border-ink);
+    cursor: pointer;
+    position: relative;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.08s, border-color 0.1s;
+}
+
+.skill-slot-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px var(--neon-cyan), 3px 5px 0 var(--border-ink);
+}
+
+.skill-slot-btn.ult-slot {
+    border-color: var(--neon-gold);
+    box-shadow: inset 0 0 0 1px var(--neon-gold), 3px 3px 0 var(--border-ink), 0 0 14px rgba(255, 208, 0, 0.4);
+}
+
+.skill-slot-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.skill-hotkey-badge {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--neon-gold);
+    border: 1px solid var(--border-wood-light);
+    font-size: 0.6rem;
+    padding: 1px 4px;
+}
+
+.skill-cooldown-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    display: none;
+    z-index: 5;
+}
+
+.battle-log-ticker {
+    flex: 1;
+    max-width: 320px;
+    height: 70px;
+    background: #0d0907;
+    border: 2px solid var(--border-ink);
+    padding: 6px 10px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.battle-log-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+/* =========================================================================
+   5. MODAL WINDOWS (승리, 패배, 회귀, 대장간)
+   ========================================================================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content-box {
+    width: 580px;
+    max-width: 90vw;
+    padding: 26px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: modalPop 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.loot-rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.loot-item-card {
+    background: #140d0a;
+    border: 2px solid var(--border-ink);
+    padding: 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.loot-item-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+/* 스킬 3단계 시퀀스 & 돌격 애니메이션 */
+@keyframes spinIn {
+    0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1.15) rotate(180deg); opacity: 0.95; }
+    100% { transform: scale(1.0) rotate(360deg); opacity: 0.85; }
+}
+
+@keyframes burstAnim {
+    0% { transform: scale(0.6); opacity: 1; filter: brightness(2.5) drop-shadow(0 0 16px var(--neon-gold)); }
+    50% { transform: scale(1.4); opacity: 0.9; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+
+@keyframes minionStrike {
+    0% { transform: translateX(0); }
+    40% { transform: translateX(30px) scale(1.15); filter: brightness(1.6); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes minionExplode {
+    0% { transform: scale(1); filter: brightness(3) drop-shadow(0 0 20px #ff0055); }
+    50% { transform: scale(1.6); opacity: 0.8; }
+    100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes heroRunBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+.hero-running {
+    animation: heroRunBounce 0.28s infinite ease-in-out;
+}
+
+/* 화면 강진동 */
+.screen-shake-strong {
+    animation: shakeAnimStrong 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shakeAnimStrong {
+    10%, 90% { transform: translate3d(-8px, -4px, 0); }
+    20%, 80% { transform: translate3d(10px, 5px, 0); }
+    30%, 50%, 70% { transform: translate3d(-12px, -6px, 0); }
+    40%, 60% { transform: translate3d(12px, 6px, 0); }
+}
+
+/* =========================================================================
+   고도화: 실시간 전투 통계 트래커, 커스텀 스크롤바, 모바일 반응형 UX
+   ========================================================================= */
+
+/* 도트풍 전통 한지 커스텀 스크롤바 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #100b08;
+    border: 1px solid var(--border-ink);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-wood);
+    border: 1px solid var(--border-brass);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-brass);
+}
+
+/* 실시간 전투 통계 바 */
+.battle-stats-tracker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(12, 9, 8, 0.88);
+    border: 1px solid var(--border-wood-light);
+    box-shadow: 2px 2px 0 var(--border-ink);
+    padding: 3px 10px;
+    font-size: 0.72rem;
+}
+
+/* 버튼 모바일 터치 개선 */
+@media (max-width: 900px) {
+    .battle-header-bar {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+    .battle-stats-tracker {
+        width: 100%;
+        justify-content: space-around;
+        margin-top: 4px;
+        font-size: 0.68rem;
+    }
+    .battle-control-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 8px;
+    }
+    .gauge-group {
+        width: 100%;
+    }
+    .skills-slots-row {
+        justify-content: center;
+    }
+    .skill-slot-btn {
+        width: 48px;
+        height: 48px;
+    }
+}

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT NECRO: 목적을 잃지 않는 사령군주 - 1단계 전시관 & 시뮬레이터</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/NeoDunggeunmo.css">
+    <style>
+        :root {
+            --bg-wood-dark: #0c0908;
+            --bg-wood-panel: #18120e;
+            --bg-hanji-dark: #231b15;
+            --bg-hanji-card: #2c221a;
+            --border-ink: #050403;
+            --border-wood: #543b28;
+            --border-wood-light: #7e5a3e;
+            --border-brass: #d4a338;
+            --neon-gold: #ffd000;
+            --neon-cyan: #00f0ff;
+            --neon-green: #00ffaa;
+            --neon-purple: #c850ff;
+            --neon-pink: #ff2a6d;
+            --text-ivory: #f5ede2;
+            --text-muted: #b8a692;
+            --font-pixel: 'NeoDunggeunmo', monospace, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-wood-dark);
+            background-image: radial-gradient(circle at 50% 20%, #201712 0%, #0c0908 100%);
+            color: var(--text-ivory);
+            font-family: var(--font-pixel);
+            padding: 24px 30px;
+            overflow-x: hidden;
+        }
+
+        /* 9-Slice 조선 목판 프레임 */
+        .showcase-card {
+            border: 26px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png?v=3') 135 160 135 160 fill / 26px 32px / 0 round;
+            background: linear-gradient(180deg, rgba(16, 12, 10, 0.94), rgba(12, 9, 8, 0.98)),
+                        url('assets/ui/ui_hanji_center_tile.png?v=3') repeat center / 256px;
+            box-shadow: 0 10px 0 var(--border-ink), 0 14px 28px rgba(0, 0, 0, 0.85);
+            padding: 20px 24px;
+            margin-bottom: 26px;
+        }
+
+        /* 9-Slice 소형 한지 족자 카드 */
+        .hanji-card {
+            border: 14px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png?v=3') 155 155 155 155 fill / 14px / 0 round;
+            background-color: #16110d;
+            box-shadow: 4px 4px 0 var(--border-ink);
+            padding: 12px 14px;
+        }
+
+        .header-title-box {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header-title-box h1 {
+            font-size: 2.4rem;
+            color: var(--neon-gold);
+            text-shadow: 3px 3px 0 var(--border-ink), 0 0 16px rgba(255, 208, 0, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .header-title-box p {
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+
+        /* 컨트롤 버튼 공통 (Forager 통통 튀는 픽셀 스타일) */
+        .btn-chip {
+            background: #1e1713;
+            border: 2px solid var(--border-ink);
+            box-shadow: inset 0 0 0 1px var(--border-wood-light), 3px 3px 0 var(--border-ink);
+            color: var(--text-ivory);
+            font-family: var(--font-pixel);
+            font-size: 0.82rem;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: transform 0.08s ease, background 0.1s ease;
+        }
+
+        .btn-chip:hover {
+            transform: translate(-1px, -2px);
+            box-shadow: inset 0 0 0 1px var(--neon-cyan), 4px 5px 0 var(--border-ink);
+            color: var(--neon-cyan);
+        }
+
+        .btn-chip:active {
+            transform: translate(2px, 2px);
+            box-shadow: inset 0 0 0 1px var(--border-wood), 1px 1px 0 var(--border-ink);
+        }
+
+        .btn-chip.active {
+            background: #2b1f18;
+            color: var(--neon-gold);
+            box-shadow: inset 0 0 0 2px var(--neon-gold), 3px 3px 0 var(--border-ink);
+        }
+
+        .btn-ctrl {
+            background: #18120e;
+            border: 2px solid var(--border-ink);
+            box-shadow: 2px 2px 0 var(--border-ink);
+            color: var(--neon-cyan);
+            font-family: var(--font-pixel);
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .btn-ctrl:hover {
+            background: #281d16;
+            color: var(--neon-gold);
+        }
+
+        /* 실제 16비트 레트로 캐릭터 도트 컨테이너 */
+        .hero-sprite-container {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            image-rendering: pixelated;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.08s linear;
+        }
+
+        .hero-pixel-sprite {
+            width: 155px;
+            height: 155px;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            background-size: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.9));
+        }
+
+        .paperdoll-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            pointer-events: none;
+        }
+
+        .rig-aura {
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 8;
+            display: none;
+            animation: pulseAura 1.4s infinite alternate;
+        }
+
+        /* 스킬 고유 메커니즘 전용 돔 & 플로팅 버블 */
+        .hero-shield-dome {
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 22;
+            display: none;
+            transition: all 0.25s ease;
+            animation: shieldDomePulse 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes shieldDomePulse {
+            0% { transform: scale(0.96); opacity: 0.8; }
+            100% { transform: scale(1.04); opacity: 1; }
+        }
+
+        .hero-floating-bubble {
+            position: absolute;
+            top: -38px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-family: var(--font-pixel);
+            text-shadow: 0 0 8px #000, 0 0 10px currentColor;
+            animation: heroFloatUp 1.25s ease-out forwards;
+            pointer-events: none;
+            z-index: 35;
+        }
+
+        @keyframes heroFloatUp {
+            0% { transform: translate(-50%, 15px) scale(0.7); opacity: 0; }
+            20% { transform: translate(-50%, -5px) scale(1.15); opacity: 1; }
+            75% { transform: translate(-50%, -20px) scale(1.0); opacity: 1; }
+            100% { transform: translate(-50%, -36px) scale(0.9); opacity: 0; }
+        }
+
+        @keyframes pulseAura {
+            0% { opacity: 0.6; transform: scale(0.96); }
+            100% { opacity: 1; transform: scale(1.04); }
+        }
+
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .set-item-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #140f0d;
+            border: 2px solid var(--border-ink);
+            padding: 8px 10px;
+            margin-bottom: 8px;
+        }
+
+        .set-item-icon {
+            width: 40px;
+            height: 40px;
+            image-rendering: pixelated;
+        }
+
+        .skill-card {
+            background: #140f0c;
+            border: 2px solid var(--border-ink);
+            box-shadow: inset 0 0 0 1px var(--border-wood);
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .skill-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+        }
+
+        .skill-card-ult {
+            border-color: var(--neon-pink);
+            box-shadow: inset 0 0 0 1px var(--neon-pink);
+        }
+
+        .skill-type-tag {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            background: #080605;
+            border: 1px solid var(--border-wood-light);
+            color: var(--neon-cyan);
+        }
+
+        .trait-slot-card {
+            background: #120e0c;
+            border: 2px solid var(--border-ink);
+            box-shadow: inset 0 0 0 1px var(--border-wood);
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+
+        .master-soul-card {
+            border-color: var(--neon-gold) !important;
+            box-shadow: 0 0 12px rgba(255, 208, 0, 0.4), inset 0 0 0 1px var(--neon-gold) !important;
+        }
+
+        .lv-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: #1b261f;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .lv-badge.master {
+            background: #33270d;
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+        }
+
+        .unique-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .unique-item-card {
+            background: #140f0c;
+            border: 2px solid var(--border-ink);
+            box-shadow: inset 0 0 0 1px var(--border-wood);
+            padding: 8px 10px;
+        }
+
+        /* 모달 오버레이 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-window {
+            width: 480px;
+            border: 22px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png?v=3') 135 160 135 160 fill / 22px 28px / 0 round;
+            background: #16110e;
+            padding: 20px 24px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+        }
+
+        @keyframes vfxPopAnim {
+            0% { transform: scale(0.6) translateY(20px); opacity: 0; }
+            30% { transform: scale(1.15) translateY(-5px); opacity: 1; }
+            70% { transform: scale(1.0) translateY(0); opacity: 1; }
+            100% { transform: scale(0.9) translateY(-15px); opacity: 0; }
+        }
+
+        .studio-stage {
+            width: 100%;
+            height: 290px;
+            background: radial-gradient(circle at 65% 60%, #1f1712 0%, #080604 100%);
+            border: 3px solid var(--border-ink);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 30px #000;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+
+        .studio-stage.shaking {
+            animation: studioScreenShake 0.4s ease-in-out;
+        }
+
+        @keyframes studioScreenShake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-6px, 4px); }
+            40% { transform: translate(5px, -4px); }
+            60% { transform: translate(-4px, 2px); }
+            80% { transform: translate(3px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .hero-minions-container {
+            position: absolute;
+            left: 15px;
+            bottom: 30px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            z-index: 12;
+            pointer-events: none;
+            max-width: 250px;
+            flex-wrap: wrap;
+        }
+
+        .minion-unit {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: minionSpawn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28), minionBob 1.2s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 6px rgba(0, 255, 170, 0.5));
+            transition: transform 0.2s;
+        }
+
+        .minion-unit img {
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .minion-unit.attacking {
+            animation: minionStrike 0.35s ease-out;
+        }
+
+        .minion-unit.exploding {
+            animation: minionExplode 0.5s ease-out forwards;
+        }
+
+        /* 지면 오브젝트가 붕 뜨지 않고 바닥에 고정된 채 자연스럽게 숨쉬는 모션 */
+        @keyframes propGroundedBreath {
+            0% { transform: scale(1.0) translateY(0); opacity: 0.95; }
+            50% { transform: scale(1.006) translateY(0); opacity: 1; }
+            100% { transform: scale(1.0) translateY(0); opacity: 0.95; }
+        }
+
+        @keyframes minionBob {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        @keyframes minionSpawn {
+            0% { transform: translateY(25px) scale(0.2); opacity: 0; filter: brightness(3); }
+            100% { transform: translateY(0) scale(1); opacity: 1; filter: brightness(1); }
+        }
+
+        @keyframes minionStrike {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(20px) scale(1.15); filter: brightness(1.6); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        @keyframes minionExplode {
+            0% { transform: scale(1); filter: brightness(3) drop-shadow(0 0 20px #ff0055); }
+            50% { transform: scale(1.6); opacity: 0.8; }
+            100% { transform: scale(2.4); opacity: 0; }
+        }
+
+        .hero-dragon-layer {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none;
+            display: none;
+            animation: dragonFly 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes dragonFly {
+            0% { transform: translateY(0) rotate(-2deg); }
+            100% { transform: translateY(-12px) rotate(2deg); }
+        }
+
+        .skills-vfx-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 최상단 타이틀 배너 -->
+    <div class="header-title-box">
+        <h1>💀 PROJECT NECRO : 목적을 잃지 않는 사령군주</h1>
+        <p>1단계: 12대 직업 16비트 도트 캐릭터 스튜디오 · 전 스킬 16비트 VFX · 96종 세트/고유 아이템 · 회귀 영혼 각인 시뮬레이터</p>
+        <div style="margin-top: 10px;">
+            <a href="index.html" class="btn-chip" style="text-decoration: none; color: var(--neon-gold); border-color: var(--neon-gold); font-size: 0.95rem; padding: 6px 20px; box-shadow: 0 0 16px rgba(255, 208, 0, 0.6); display: inline-block;">
+                🎮 2D 도트 RPG 본 게임 플레이 (PLAY GAME) ▶
+            </a>
+        </div>
+    </div>
+
+    <!-- 12대 플레이어블 클래스 선택 바 -->
+    <div class="hanji-card" style="margin-bottom: 20px;">
+        <div style="font-size: 0.85rem; color: var(--neon-gold); margin-bottom: 8px;">⚔️ 12대 플레이어블 클래스 전환 (소설 등장 전 직업 총망라):</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="classSelectorTabs">
+            <button class="btn-chip active" data-class="necro" onclick="selectClass('necro')">💀 네크로맨서</button>
+            <button class="btn-chip" data-class="guardian" onclick="selectClass('guardian')">🛡️ 가디언</button>
+            <button class="btn-chip" data-class="storm_wizard" onclick="selectClass('storm_wizard')">⚡ 스톰 위저드</button>
+            <button class="btn-chip" data-class="sniper" onclick="selectClass('sniper')">🎯 팬텀 스나이퍼</button>
+            <button class="btn-chip" data-class="priest" onclick="selectClass('priest')">✨ 하이 프리스트</button>
+            <button class="btn-chip" data-class="assassin" onclick="selectClass('assassin')">🗡️ 섀도우 어쌔신</button>
+            <button class="btn-chip" data-class="sword_master" onclick="selectClass('sword_master')">🐉 소드마스터</button>
+            <button class="btn-chip" data-class="death_knight" onclick="selectClass('death_knight')">⚔️ 데스나이트</button>
+            <button class="btn-chip" data-class="martial_king" onclick="selectClass('martial_king')">👊 권왕 무투가</button>
+            <button class="btn-chip" data-class="psionic_tactician" onclick="selectClass('psionic_tactician')">🔮 사이오닉 마도사</button>
+            <button class="btn-chip" data-class="berserker" onclick="selectClass('berserker')">🪓 그래비티 버서커</button>
+            <button class="btn-chip" data-class="cryo_empress" onclick="selectClass('cryo_empress')">❄️ 크라이오 엠프레스</button>
+        </div>
+    </div>
+
+    <!-- 섹션 1: 12대 직업 16비트 도트 캐릭터 스튜디오 & 10프레임 액션 & 세트 장착 -->
+    <section class="showcase-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-wood-light); padding-bottom: 8px; margin-bottom: 14px;">
+            <div>
+                <span id="currentClassName" style="font-size: 1.3rem; color: var(--neon-gold);">💀 네크로맨서</span>
+                <span id="currentClassModel" style="font-size: 0.8rem; color: var(--neon-cyan); margin-left: 8px;">최미남 (사령군주)</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-chip active" id="btnViewSide" onclick="switchView('side')">전투 뷰 (우향 Facing Right)</button>
+                <button class="btn-chip" id="btnViewFront" onclick="switchView('front')">비전투 뷰 (정면 Front View)</button>
+            </div>
+        </div>
+
+        <div class="studio-grid">
+            <!-- 좌측: 클래스 프로필 및 5세트 아이템 -->
+            <div>
+                <div class="hanji-card" style="margin-bottom: 12px;">
+                    <div style="font-size: 0.8rem; color: var(--neon-cyan);">주력 스탯: <strong id="currentClassStat">INT</strong></div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;" id="currentClassDesc">설명 로딩 중...</div>
+                    <div style="font-size: 0.72rem; color: var(--neon-green); margin-top: 6px;">패시브: <span id="currentClassPassive"></span></div>
+                    <div style="font-size: 0.72rem; color: var(--neon-pink); margin-top: 4px;">궁극기: <span id="currentClassUlt"></span></div>
+                </div>
+
+                <div style="font-size: 0.82rem; color: var(--neon-gold); margin-bottom: 6px;">
+                    💎 직업 전용 5부작 신화 세트 (아이템 아이콘 연동):
+                    <span id="equippedSetCountBadge" style="font-size: 0.7rem; color: var(--neon-cyan); float: right;">5/5 장착</span>
+                </div>
+                <div id="classSetPartsList"></div>
+            </div>
+
+            <!-- 중앙: 16비트 도트 캐릭터 무대 & 부하 군단 대열 & 10프레임 액션 & VFX 투사 -->
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div class="studio-stage" id="studioStage" style="background-image: url('assets/ui/regions/town_bg_1_f0.png?v=3'); background-size: cover; background-position: center; image-rendering: pixelated;">
+                    <!-- [Layer 0] 배경 딤 오버레이 -->
+                    <div style="position: absolute; inset: 0; background: rgba(10, 7, 5, 0.42); pointer-events: none; z-index: 1;"></div>
+                    <!-- [Layer 2] GIMP 분리 나뭇잎/수풀 4프레임 루프 레이어 (7 FPS: 기본->살짝휨->최대휨->중간복귀) -->
+                    <div id="studioFoliageLayer" style="position: absolute; inset: 0; background-image: url('assets/ui/regions/region_obj_1_f0.png?v=6'); background-size: 100% 100%; image-rendering: pixelated; pointer-events: none; z-index: 3; animation: propGroundedBreath 2.6s ease-in-out infinite alternate; transform-origin: bottom center;"></div>
+                    <!-- 하단 안개 바닥선 -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 45px; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); pointer-events: none; border-bottom: 2px solid rgba(255,204,0,0.2); z-index: 4;"></div>
+
+                    <!-- 좌측 상공: 빙룡(Frost Dragon) 소환 레이어 -->
+                    <div class="hero-dragon-layer" id="heroDragonLayer">
+                        <img src="assets/summons/minion_frost_dragon.png?v=3" style="width: 140px; height: 105px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 0 16px rgba(100, 220, 255, 0.9));">
+                    </div>
+
+                    <!-- 좌측 후방: 소환수 부하 군단 대열 (Behind the Hero) -->
+                    <div class="hero-minions-container" id="heroMinionsContainer"></div>
+
+                    <!-- 중앙/우측: 플레이어 영웅 캐릭터 (240x240 다중 레이어 페이퍼돌) -->
+                    <div class="hero-sprite-container" id="heroSpriteContainer" style="margin-left: 90px; z-index: 15;">
+                        <img id="layerWings" class="paperdoll-layer" style="z-index: 1; display: none;" alt="wings">
+                        <img id="layerBody" class="paperdoll-layer" style="z-index: 2;" alt="body">
+                        <img id="layerArmor" class="paperdoll-layer" style="z-index: 3; display: none;" alt="armor">
+                        <img id="layerWeapon" class="paperdoll-layer" style="z-index: 4; display: none;" alt="weapon">
+                        <img id="layerMutation" class="paperdoll-layer" style="z-index: 5; display: none;" alt="mutation">
+                        <div class="hero-pixel-sprite" id="heroPixelSprite" style="display: none;"></div>
+                        <div class="rig-aura" id="partSetAura"></div>
+                        <!-- 고유 방어막/마나실드/무적 돔 -->
+                        <div class="hero-shield-dome" id="heroShieldDome"></div>
+                        <!-- 영웅 버프/치유/쉴드 플로팅 텍스트 레이어 -->
+                        <div id="heroFloatingLayer" style="position: absolute; inset: 0; pointer-events: none; z-index: 36;"></div>
+                    </div>
+
+                    <!-- 전방 타격존: 16비트 도트 VFX 및 피격 데미지 오버레이 -->
+                    <div id="studioVfxLayer" style="position: absolute; right: 35px; pointer-events: none; z-index: 25;"></div>
+
+                    <div id="currentFrameIndicator" style="position: absolute; bottom: 8px; left: 10px; font-size: 0.72rem; color: var(--neon-cyan);">
+                        FRAME: 1/10 (IDLE)
+                    </div>
+                </div>
+
+                <!-- 10프레임 모션 전환 컨트롤 -->
+                <div style="display: flex; gap: 8px; margin-top: 10px;" id="animButtons">
+                    <button class="btn-chip active" data-anim="idle" onclick="setAnimation('idle')">대기 (Idle)</button>
+                    <button class="btn-chip" data-anim="walk" onclick="setAnimation('walk')">행군 (Walk)</button>
+                    <button class="btn-chip" data-anim="attack" onclick="setAnimation('attack')">공격 (Attack)</button>
+                    <button class="btn-chip" data-anim="cast" onclick="setAnimation('cast')">시전 (Cast)</button>
+                </div>
+
+                <!-- 사령 부하 군단 전술 지휘 툴바 -->
+                <div class="hanji-card" style="margin-top: 10px; width: 100%; padding: 8px 12px; border-color: rgba(0, 255, 170, 0.45); box-sizing: border-box;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div style="font-size: 0.78rem; color: var(--neon-green);">
+                            💀 <strong id="minionArmyTitle">사령 부하 군단 대열 (Summoned Army)</strong>
+                            <span id="minionArmyCountBadge" style="color: var(--neon-cyan); margin-left: 8px; font-size: 0.72rem;">0기 소환 중</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);" id="minionArmyBuffText">군단 공격력 버프: +0%</div>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #00ffaa; color: #00ffaa;" onclick="spawnMinionUnit('warrior')">+ 해골 전사</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #00ffaa; color: #00ffaa;" onclick="spawnMinionUnit('archer')">+ 해골 궁병</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #bb00ff; color: #bb00ff;" onclick="spawnMinionUnit('mage')">+ 해골 술사</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #ff0055; color: #ff0055;" onclick="spawnMinionUnit('knight')">+ 데스나이트</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #ffcc00; color: #ffcc00;" onclick="commandMinionsAttack()">⚔️ 군단 일제 돌격</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #ff3333; color: #ff3333;" onclick="corpseExplodeMinion()">💥 시체 폭발 연계</button>
+                        <button class="btn-chip" style="font-size: 0.68rem; padding: 3px 8px; border-color: #888888; color: #aaaaaa;" onclick="clearMinions()">🔄 군단 해산</button>
+                    </div>
+                </div>
+
+                <div id="skillCombatLog" style="font-size: 0.74rem; color: var(--neon-gold); margin-top: 8px;">
+                    ▶ 스킬 카드를 클릭해 10프레임 타격 모션, 16비트 VFX 및 실제 부하 군단 소환을 시험해 보십시오.
+                </div>
+            </div>
+
+            <!-- 우측: 직업 전용 스킬 트리 (6종 액티브 & 궁극기) -->
+            <div>
+                <div style="font-size: 0.85rem; color: var(--neon-gold); margin-bottom: 8px;">🔥 직업 전용 스킬 트리 (클릭 시 VFX 시험):</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;" id="classSkillsGrid"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 1-B: 전 12개 직업 72종 전용 도트 스킬 VFX 전시대 -->
+    <section class="showcase-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-wood-light); padding-bottom: 8px; margin-bottom: 14px;">
+            <div>
+                <span style="font-size: 1.25rem; color: var(--neon-gold);">✨ 12대 직업 x 72종 전용 16비트 도트 스킬 VFX 전시대</span>
+                <span style="font-size: 0.78rem; color: var(--neon-cyan); margin-left: 10px;">모든 스킬에 각기 다른 고유 16비트 도트 파티클 & 타격 판정 완비</span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">총 72개 개별 도트 에셋</span>
+        </div>
+
+        <!-- 직업별 필터 칩스 -->
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;" id="skillGalleryFilterTabs">
+            <button class="btn-chip active" data-filter="all" onclick="setSkillGalleryFilter('all')">전체 (72종)</button>
+            <button class="btn-chip" data-filter="necro" onclick="setSkillGalleryFilter('necro')">💀 네크로맨서</button>
+            <button class="btn-chip" data-filter="guardian" onclick="setSkillGalleryFilter('guardian')">🛡️ 가디언</button>
+            <button class="btn-chip" data-filter="sniper" onclick="setSkillGalleryFilter('sniper')">🏹 스나이퍼</button>
+            <button class="btn-chip" data-filter="priest" onclick="setSkillGalleryFilter('priest')">✝️ 프리스트</button>
+            <button class="btn-chip" data-filter="sword_master" onclick="setSkillGalleryFilter('sword_master')">⚔️ 소드마스터</button>
+            <button class="btn-chip" data-filter="assassin" onclick="setSkillGalleryFilter('assassin')">🗡️ 암살자</button>
+            <button class="btn-chip" data-filter="berserker" onclick="setSkillGalleryFilter('berserker')">🔥 버서커</button>
+            <button class="btn-chip" data-filter="cryo_empress" onclick="setSkillGalleryFilter('cryo_empress')">❄️ 크라이오 엠프레스</button>
+            <button class="btn-chip" data-filter="storm_wizard" onclick="setSkillGalleryFilter('storm_wizard')">⚡ 스톰 위저드</button>
+            <button class="btn-chip" data-filter="martial_king" onclick="setSkillGalleryFilter('martial_king')">👊 권왕</button>
+            <button class="btn-chip" data-filter="psionic_tactician" onclick="setSkillGalleryFilter('psionic_tactician')">🔮 사이오닉 마도사</button>
+            <button class="btn-chip" data-filter="death_knight" onclick="setSkillGalleryFilter('death_knight')">⚔️ 데스나이트</button>
+        </div>
+
+        <div class="skills-vfx-gallery-grid" id="allSkillsVfxGrid"></div>
+    </section>
+
+    <!-- 섹션 2: 회귀(Regression) & 특성·재능 Lv.1~10 & 영혼 각인 시뮬레이터 -->
+    <section class="showcase-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-wood-light); padding-bottom: 8px; margin-bottom: 14px;">
+            <div>
+                <span style="font-size: 1.25rem; color: var(--neon-gold);">🔄 회귀(Regression) 메타 성장 & 영혼 각인 시스템</span>
+                <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 10px;">누적 회귀 횟수: <strong style="color:var(--neon-cyan);" id="regressionCountDisplay">0회</strong></span>
+            </div>
+            <button class="btn-chip" style="color: var(--neon-pink); border-color: var(--neon-pink);" onclick="openRegressionModal()">
+                ⚡ [회귀 실행] 장비·골드 소멸 & 특성/재능 선택
+            </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <!-- 좌측: 특성(Traits) 슬롯 목록 -->
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--neon-green);">🧬 장착된 신체 특성 (Traits)</span>
+                    <span style="font-size: 0.72rem; color: var(--neon-cyan);" id="traitSlotsInfo">특성 슬롯: 1/1칸</span>
+                </div>
+                <div id="equippedTraitsList"></div>
+            </div>
+
+            <!-- 우측: 재능(Talents) 슬롯 목록 -->
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--neon-purple);">📖 장착된 회귀 재능 (Talents)</span>
+                    <span style="font-size: 0.72rem; color: var(--neon-cyan);" id="talentSlotsInfo">재능 슬롯: 1/1칸</span>
+                </div>
+                <div id="equippedTalentsList"></div>
+            </div>
+        </div>
+
+        <!-- 만렙 영혼 각인 전용 슬롯 -->
+        <div class="hanji-card" id="soulSlotBox" style="margin-top: 14px; display: none; border-color: var(--neon-gold);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="color: var(--neon-gold); font-size: 0.95rem;">🌟 [최초 만렙 달성 특전] 영혼 각인 전용 재능칸 (Master Soul Slot)</span>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 2px;">오직 Lv.10(만렙)에 도달하여 영혼에 새겨진 특성/재능만 장착 가능합니다.</div>
+                </div>
+                <div id="soulSlotStatus"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 3: 36종 빌드 체인저 고유(Unique) 아이템 도감 -->
+    <section class="showcase-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-wood-light); padding-bottom: 8px; margin-bottom: 14px;">
+            <span style="font-size: 1.25rem; color: var(--neon-gold);">💎 빌드 체인저 고유(Unique) 아이템 36종 도감</span>
+            <span style="font-size: 0.75rem; color: var(--neon-cyan);">을지로 대장간 · 인천항 암시장 · 10왕 유물 총망라</span>
+        </div>
+        <div class="unique-items-grid" id="uniqueItemsGrid"></div>
+    </section>
+
+    <!-- 섹션 4: 14대 작전 지역 [생존자 마을 거점 ➔ 6대 차원문(Gate) 진입 ➔ 6웨이브(84종 괴수) 실전 시뮬레이터] -->
+    <section class="showcase-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-wood-light); padding-bottom: 8px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <span style="font-size: 1.25rem; color: var(--neon-gold);">🚪 14대 지역별 [마을 차원문(Gate) 진입 ➔ 6웨이브(84종 괴수) 전투] 시뮬레이터</span>
+                <span id="currentRegionTitle" style="font-size: 0.85rem; color: var(--neon-cyan); margin-left: 10px;"></span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <span id="currentGateBadge" style="font-size: 0.75rem; padding: 3px 10px; border: 2px solid var(--neon-gold); background: rgba(0,0,0,0.8); color: var(--neon-gold);">🚪 철문 (Iron Gate)</span>
+            </div>
+        </div>
+
+        <!-- 6대 차원문(Gate) 등급별 필터/요약 바 -->
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; padding: 8px 10px; background: rgba(10, 7, 5, 0.75); border: 1px solid var(--border-wood);">
+            <span style="font-size: 0.74rem; color: var(--neon-gold); align-self: center; margin-right: 4px;">🔑 차원문 등급 체계:</span>
+            <span style="font-size: 0.7rem; color: #a8b4c4; padding: 2px 7px; border: 1px solid #a8b4c4; background: rgba(168,180,196,0.1);">🚪 철문 (1지역)</span>
+            <span style="font-size: 0.7rem; color: #e69650; padding: 2px 7px; border: 1px solid #e69650; background: rgba(230,150,80,0.1);">🚪 동문 (3·5지역)</span>
+            <span style="font-size: 0.7rem; color: #00f0ff; padding: 2px 7px; border: 1px solid #00f0ff; background: rgba(0,240,255,0.1);">🚪 은문 (2·4·6지역)</span>
+            <span style="font-size: 0.7rem; color: #ffd000; padding: 2px 7px; border: 1px solid #ffd000; background: rgba(255,208,0,0.1);">🚪 금문 (7·8·11·13지역)</span>
+            <span style="font-size: 0.7rem; color: #c850ff; padding: 2px 7px; border: 1px solid #c850ff; background: rgba(200,80,255,0.1);">🚪 플래티넘문 (9·10·12지역)</span>
+            <span style="font-size: 0.7rem; color: #ff2a6d; padding: 2px 7px; border: 1px solid #ff2a6d; background: rgba(255,42,109,0.15);">🚪 다이아몬드문 (14지역 종언)</span>
+        </div>
+
+        <!-- 1~14지역 선택 칩스 -->
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;" id="regionSelectorTabs">
+            <button class="btn-chip active" data-region="1" onclick="switchRegionTheme(1)">1. 서울 을지로 [철문]</button>
+            <button class="btn-chip" data-region="2" onclick="switchRegionTheme(2)">2. 북한산 성역 [은문]</button>
+            <button class="btn-chip" data-region="3" onclick="switchRegionTheme(3)">3. 인천항 부두 [동문]</button>
+            <button class="btn-chip" data-region="4" onclick="switchRegionTheme(4)">4. 설악산 대청봉 [은문]</button>
+            <button class="btn-chip" data-region="5" onclick="switchRegionTheme(5)">5. 평양 지하벙커 [동문]</button>
+            <button class="btn-chip" data-region="6" onclick="switchRegionTheme(6)">6. 도쿄 음양사 [은문]</button>
+            <button class="btn-chip" data-region="7" onclick="switchRegionTheme(7)">7. 마카오 불야성 [금문]</button>
+            <button class="btn-chip" data-region="8" onclick="switchRegionTheme(8)">8. 블라디보스토크 [금문]</button>
+            <button class="btn-chip" data-region="9" onclick="switchRegionTheme(9)">9. 태평양 해연 [플래티넘문]</button>
+            <button class="btn-chip" data-region="10" onclick="switchRegionTheme(10)">10. 히말라야 묘지 [플래티넘문]</button>
+            <button class="btn-chip" data-region="11" onclick="switchRegionTheme(11)">11. 시베리아·사막 [금문]</button>
+            <button class="btn-chip" data-region="12" onclick="switchRegionTheme(12)">12. 라인강·로키산 [플래티넘문]</button>
+            <button class="btn-chip" data-region="13" onclick="switchRegionTheme(13)">13. 성층권 모함 [금문]</button>
+            <button class="btn-chip" data-region="14" onclick="switchRegionTheme(14)">14. 성층권 결전 [다이아몬드문]</button>
+        </div>
+
+        <!-- 선택된 문(Gate) 고유 환경 특성 & 획득 가능 신체 특성 & 드랍 보너스 정보창 -->
+        <div class="hanji-card" style="margin-bottom: 14px; padding: 10px 14px; border-color: var(--border-brass);">
+            <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px; align-items: center;">
+                <div>
+                    <div style="font-size: 0.78rem; color: var(--neon-gold); margin-bottom: 3px;" id="gateFeatureTitle">🚪 차원문 특성 & 전장 배경 해설</div>
+                    <div style="font-size: 0.72rem; color: var(--text-ivory); line-height: 1.35;" id="gateFeatureDesc"></div>
+                </div>
+                <div style="background: rgba(0,0,0,0.55); padding: 7px 10px; border-left: 3px solid var(--neon-green);">
+                    <div style="font-size: 0.68rem; color: var(--text-muted);">🧬 해당 차원문 각성 특성 (Trait) & 환경 기믹</div>
+                    <div style="font-size: 0.76rem; color: var(--neon-green); margin-top: 2px; font-weight: bold;" id="gateRegionTrait"></div>
+                    <div style="font-size: 0.68rem; color: var(--neon-cyan); margin-top: 3px;" id="gateEnvModifier"></div>
+                </div>
+                <div style="background: rgba(0,0,0,0.55); padding: 7px 10px; border-left: 3px solid var(--neon-gold);">
+                    <div style="font-size: 0.68rem; color: var(--text-muted);">🎁 차원문 등급 클리어 보상 배율</div>
+                    <div style="font-size: 0.74rem; color: var(--neon-gold); margin-top: 2px;" id="gateDropBonus"></div>
+                    <div style="font-size: 0.68rem; color: var(--neon-pink); margin-top: 3px;" id="gateBossSummary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 지역별 고유 환경 오브젝트 4프레임 루프 제어 & 실시간 상태 바 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; padding: 7px 12px; background: rgba(12, 18, 14, 0.9); border: 1px solid var(--neon-green);">
+            <div style="font-size: 0.72rem; color: var(--text-ivory); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="color: var(--neon-green); font-weight: bold;">🎨 [지역별 고유 오브젝트 4프레임 루프]</span>
+                <span id="regionPropNameBadge" style="color: var(--neon-cyan); font-weight: bold;">🏮 1지역 오브젝트: 을지로 청사초롱 가로등 & 지하 발광 포자</span>
+                <span style="color: #666;">|</span>
+                <span id="foliageLoopStatusText" style="color: var(--neon-gold);">Frame 1/4 (기본 위치 · 7 FPS)</span>
+                <span style="color: #666;">|</span>
+                <span style="color: var(--neon-pink);">🧙 캐릭터/괴수: 2~4프레임 대기 호흡</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+                <button class="btn-chip active" id="btnToggleFoliageLoop" style="font-size: 0.65rem; padding: 2px 8px;" onclick="toggleFoliageSwayLoop()">🌿 은문 스타일 부드러운 유영(Float) 모션: ON</button>
+            </div>
+        </div>
+
+        <!-- 좌/우 듀얼 인터랙티브 스테이지: [좌: 생존자 거점 마을 & 차원문 입장] ➔ [우: 차원문 내부 6웨이브 전투 스테이지] -->
+        <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px;">
+            <!-- 좌: 생존자 거점 마을 배경 + 영웅(정면 뷰) + 클릭 가능한 차원문(Gate) 오브젝트 -->
+            <div style="height: 290px; border: 3px solid var(--border-ink); position: relative; background-size: cover; background-position: center; image-rendering: pixelated; overflow: hidden;" id="townBgView">
+                <!-- [Layer 2] 분리된 나뭇잎/수풀/풀잎 4프레임 반복 레이어 (6~8 FPS 리듬감 있는 흔들림) -->
+                <div id="townFoliageLayer" style="position: absolute; inset: 0; background-image: url('assets/ui/regions/region_obj_1_f0.png?v=6'); background-size: 100% 100%; image-rendering: pixelated; pointer-events: none; z-index: 4; animation: propGroundedBreath 2.6s ease-in-out infinite alternate; transform-origin: bottom center;"></div>
+                <!-- 상단 배지 -->
+                <div style="position: absolute; top: 10px; left: 10px; background: rgba(10, 7, 5, 0.9); border: 2px solid var(--border-ink); padding: 4px 10px; font-size: 0.74rem; color: var(--neon-gold); z-index: 10;">
+                    🏘️ 생존자 안전 거점 (정면 대기 뷰)
+                </div>
+                <div id="townStatusBadge" style="position: absolute; top: 10px; right: 10px; background: rgba(0, 255, 170, 0.18); border: 1px solid var(--neon-green); padding: 3px 8px; font-size: 0.68rem; color: var(--neon-green); z-index: 10;">
+                    🟢 마을 대기 중 (문을 클릭해 입장)
+                </div>
+
+                <!-- 마을 내 영웅 아바타 (정면/대기 도트) -->
+                <div id="townHeroActor" style="position: absolute; bottom: 18px; left: 36px; width: 110px; height: 110px; transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1); z-index: 8; text-align: center;">
+                    <img id="townHeroImg" src="assets/agents/agent_male_nemesis.png?v=3" style="width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9));">
+                    <div style="font-size: 0.65rem; color: #fff; background: rgba(0,0,0,0.8); border: 1px solid var(--neon-gold); padding: 1px 5px; display: inline-block; margin-top: -6px;">사령군주 (마을)</div>
+                </div>
+
+                <!-- 우측 차원문(Gate) 클릭 오브젝트 -->
+                <div id="townGatePortalObj" onclick="enterRegionGate()" title="클릭하여 차원문 내부 던전으로 진입!" style="position: absolute; bottom: 14px; right: 26px; width: 145px; height: 175px; cursor: pointer; z-index: 9; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; transition: transform 0.2s;">
+                    <div id="townGateGlow" style="position: absolute; inset: 10px; border-radius: 50%; filter: blur(16px); opacity: 0.65; pointer-events: none;"></div>
+                    <img id="townGateSprite" src="assets/ui/gates/gate_iron.png?v=3" style="width: 135px; height: 150px; object-fit: contain; image-rendering: pixelated; position: relative; z-index: 2; animation: minionBob 1.6s ease-in-out infinite alternate;">
+                    <button class="btn-chip" id="btnEnterGateAction" style="position: relative; z-index: 3; margin-top: -6px; font-size: 0.7rem; padding: 3px 10px; background: #120b07; color: var(--neon-gold); border-color: var(--neon-gold); box-shadow: 0 0 12px rgba(255, 208, 0, 0.6);">
+                        🚪 차원문 진입 ▶
+                    </button>
+                </div>
+            </div>
+
+            <!-- 우: 차원문 내부 전투 전장 배경 + 6웨이브 진행 바 + 영웅(우향) vs 지역 고유 괴수(좌향 scaleX(-1)) -->
+            <div style="height: 290px; border: 3px solid var(--border-ink); position: relative; background-size: 2400px 100%; background-position: 0% center; background-repeat: no-repeat; image-rendering: pixelated; overflow: hidden; transition: background-position 0.95s cubic-bezier(0.22, 1, 0.36, 1);" id="battleBgView">
+                <!-- [Layer 2] 분리된 나뭇잎/수풀/풀잎 4프레임 반복 레이어 (6~8 FPS) -->
+                <div id="battleFoliageLayer" style="position: absolute; inset: 0; background-image: url('assets/ui/regions/nature_props_pano_1.png?v=6'); background-size: 2400px 100%; background-position: 0% center; background-repeat: no-repeat; image-rendering: pixelated; pointer-events: none; z-index: 4; transition: background-position 0.95s cubic-bezier(0.22, 1, 0.36, 1); animation: propGroundedBreath 2.6s ease-in-out infinite alternate; transform-origin: bottom center;"></div>
+                <!-- 차원문 워프 플래시 오버레이 -->
+                <div id="gatePortalFlashOverlay" style="position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,240,255,0.85), rgba(0,0,0,0.95)); opacity: 0; pointer-events: none; transition: opacity 0.35s; z-index: 30; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.15rem; text-shadow: 0 0 12px var(--neon-cyan);">
+                    🌀 차원문 워프 진입 중...
+                </div>
+
+                <!-- 상단 웨이브 헤더 및 컨트롤 -->
+                <div style="position: absolute; top: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 15;">
+                    <div style="background: rgba(10, 7, 5, 0.9); border: 2px solid var(--border-ink); padding: 4px 10px; font-size: 0.74rem; color: var(--neon-pink);">
+                        ⚔️ <span id="battleStageWaveBadge">WAVE 1/6 (일반 괴수)</span> : <strong id="battleBossName" style="color: var(--neon-gold);"></strong>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button class="btn-chip" style="font-size: 0.66rem; padding: 3px 8px; color: var(--neon-green); border-color: var(--neon-green);" onclick="attackGateWaveMonster()">⚡ 타격/스킬 처치</button>
+                        <button class="btn-chip" style="font-size: 0.66rem; padding: 3px 8px; color: var(--neon-cyan); border-color: var(--neon-cyan);" onclick="nextGateWave()">⏭️ 다음 웨이브</button>
+                        <button class="btn-chip" style="font-size: 0.66rem; padding: 3px 8px; color: var(--text-muted);" onclick="returnToTownFromGate()">🏘️ 마을 귀환</button>
+                    </div>
+                </div>
+
+                <!-- 웨이브 1~6 단계 선택 미니 탭 -->
+                <div id="gateWaveStepsBar" style="position: absolute; top: 42px; left: 10px; display: flex; gap: 4px; z-index: 15;">
+                    <button class="btn-chip active" data-wave="1" style="font-size:0.62rem; padding:2px 6px;" onclick="setGateWave(1)">W1.척후</button>
+                    <button class="btn-chip" data-wave="2" style="font-size:0.62rem; padding:2px 6px;" onclick="setGateWave(2)">W2.주력</button>
+                    <button class="btn-chip" data-wave="3" style="font-size:0.62rem; padding:2px 6px;" onclick="setGateWave(3)">W3.강습</button>
+                    <button class="btn-chip" data-wave="4" style="font-size:0.62rem; padding:2px 6px;" onclick="setGateWave(4)">W4.정예</button>
+                    <button class="btn-chip" data-wave="5" style="font-size:0.62rem; padding:2px 6px; color:var(--neon-cyan);" onclick="setGateWave(5)">W5.수문장</button>
+                    <button class="btn-chip" data-wave="6" style="font-size:0.62rem; padding:2px 6px; color:var(--neon-pink);" onclick="setGateWave(6)">W6.보스</button>
+                </div>
+
+                <!-- 좌측: 차원문 진입 완료 영웅(우향 Facing Right) & 입구 포털 잔상 -->
+                <div id="battleHeroPartyBox" style="position: absolute; bottom: 16px; left: 22px; display: flex; align-items: flex-end; gap: 6px; z-index: 12; opacity: 0.45; transition: all 0.35s;">
+                    <img id="battleEntranceGateMini" src="assets/ui/gates/gate_iron.png?v=3" style="width: 64px; height: 74px; object-fit: contain; image-rendering: pixelated; opacity: 0.85;">
+                    <div style="text-align: center;">
+                        <img id="battleHeroSpriteImg" src="assets/agents/agent_male_nemesis.png?v=3" style="width: 105px; height: 105px; object-fit: contain; image-rendering: pixelated; transform: scaleX(1); filter: drop-shadow(0 0 10px rgba(0,255,170,0.6));">
+                        <div id="battleHeroStatusTag" style="font-size: 0.62rem; background: rgba(0,0,0,0.85); color: var(--neon-green); border: 1px solid var(--neon-green); padding: 1px 5px;">차원문 입장 대기</div>
+                    </div>
+                </div>
+
+                <!-- 중앙: 전투 VFX 폭발 레이어 -->
+                <div id="gateBattleVfxLayer" style="position: absolute; inset: 0; pointer-events: none; z-index: 20;"></div>
+
+                <!-- 우측: 해당 차원문 웨이브 몬스터 (좌향 scaleX(-1)) + 체력바 -->
+                <div id="battleMonsterContainer" style="position: absolute; bottom: 16px; right: 32px; display: flex; flex-direction: column; align-items: center; z-index: 14; transition: bottom 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);">
+                    <div style="background: rgba(10,7,5,0.9); border: 1px solid var(--border-ink); padding: 2px 8px; margin-bottom: 4px; text-align: center; min-width: 145px;">
+                        <div id="battleMonsterRoleTag" style="font-size: 0.62rem; color: var(--neon-cyan);">WAVE 1 · 지역 고유 괴수</div>
+                        <div style="width: 100%; height: 8px; background: #220a0a; border: 1px solid #000; margin-top: 2px; overflow: hidden;">
+                            <div id="battleMonsterHpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ff2a6d, #ffcc00); transition: width 0.2s;"></div>
+                        </div>
+                        <div id="battleMonsterHpText" style="font-size: 0.6rem; color: #fff; margin-top: 1px;">HP: 100%</div>
+                    </div>
+                    <div id="battleBossSprite" onclick="attackGateWaveMonster()" title="클릭하여 몬스터 타격!" style="width: 138px; height: 138px; cursor: pointer; background-repeat: no-repeat; background-position: center bottom; background-size: contain; transform: scaleX(-1); image-rendering: pixelated; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.9)); transition: transform 0.15s, filter 0.15s;"></div>
+                    <div id="battleMonsterGroundShadow" style="width: 100px; height: 14px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 75%); border-radius: 50%; margin-top: -6px; transition: all 0.4s ease-out; pointer-events: none;"></div>
+                </div>
+
+                <!-- 하단 전투 로그 바 -->
+                <div id="gateBattleLogBar" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(8, 6, 4, 0.88); border-top: 1px solid var(--border-wood); padding: 4px 10px; font-size: 0.68rem; color: var(--neon-gold); z-index: 18;">
+                    ▶ 좌측 마을 화면의 [🚪 차원문]을 클릭하면 영웅이 문을 통과해 6웨이브 던전 전투에 돌입합니다!
+                </div>
+            </div>
+        </div>
+
+        <!-- 해당 차원문(지역) 출현 6종 고유 몬스터 패밀리 도감 (일반 4종 + 5웨이브 수문장 + 6웨이브 보스) -->
+        <div style="margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.86rem; color: var(--neon-gold);">👾 현재 차원문 출현 괴수 라인업 (클릭 시 해당 웨이브 즉시 스폰 · 전 14개 지역 × 6종 = 84종 고유 도트):</span>
+                <span style="font-size: 0.72rem; color: var(--neon-cyan);" id="regionRosterSummary">Wave 1~4 일반 괴수 · Wave 5 수문장 · Wave 6 보스</span>
+            </div>
+            <div id="regionMonstersRosterGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;"></div>
+        </div>
+    </section>
+
+    <!-- 회귀 실행 선택 모달 창 -->
+    <div class="modal-overlay" id="regressionSelectModal">
+        <div class="modal-window">
+            <h3 style="color: var(--neon-gold); font-size: 1.2rem; margin-bottom: 8px;">🔄 회귀(Regression) 실행</h3>
+            <p style="font-size: 0.75rem; color: #d6c7b2; line-height: 1.4; margin-bottom: 14px;">
+                회귀 시 현재 보유한 모든 장비와 골드는 소멸합니다.<br>
+                대신 이번 생에서 계승할 <strong>특성 1개와 재능 1개</strong>를 선택하십시오.<br>
+                <span style="color: var(--neon-cyan);">(동일 항목 선택 시 슬롯 소모 없이 레벨이 올라 +50%p씩 효율이 증가합니다)</span>
+            </p>
+
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 0.78rem; color: var(--neon-green); display: block; margin-bottom: 4px;">신체 특성 (Trait) 선택:</label>
+                <select id="regressionTraitSelect" style="width: 100%; background: #100c09; color: #fff; border: 2px solid var(--border-ink); padding: 6px; font-family: var(--font-pixel);"></select>
+            </div>
+
+            <div style="margin-bottom: 18px;">
+                <label style="font-size: 0.78rem; color: var(--neon-purple); display: block; margin-bottom: 4px;">회귀 재능 (Talent) 선택:</label>
+                <select id="regressionTalentSelect" style="width: 100%; background: #100c09; color: #fff; border: 2px solid var(--border-ink); padding: 6px; font-family: var(--font-pixel);"></select>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn-chip" onclick="closeRegressionModal()">취소</button>
+                <button class="btn-chip" style="color: var(--neon-gold); border-color: var(--neon-gold);" onclick="confirmRegression()">맹세하고 회귀하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="display_data.js?v=10"></script>
+    <script src="display.js?v=10"></script>
+</body>
+</html>
