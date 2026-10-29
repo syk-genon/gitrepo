@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT 2100 - 통합 아케이드 전시 & 특성 시뮬레이터</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* ==========================================================================
+         * 🏮 PROJECT 2100 SHOWCASE THEME: 조선 목판/한지 + 사이버펑크 네온 + 포리저/던그리드 도트
+         * ========================================================================== */
+        @font-face {
+            font-family: 'NeoDunggeunmo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/NeoDunggeunmo.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            /* 조선 흑단 목판 & 고서 한지 다크 베이스 */
+            --bg-deep: #0b0806;           /* 칠흑 먹색 아포칼립스 밤 */
+            --bg-card: #18120e;           /* 그을린 조선 고목판 (메인 카드) */
+            --bg-card-inner: #221914;     /* 옻칠 목판 (내부 슬롯/칩) */
+            --bg-card-hover: #2d211a;     /* 호버 시 밝아지는 목판 */
+            --bg-hanji-dark: #15110e;     /* 어두운 한지 속지 */
+
+            /* 픽셀 보더 & 황동 두석(장석) 컬러 */
+            --border-ink: #040302;        /* 도트 외곽 먹선 */
+            --border-wood: #4a3525;       /* 목판 안쪽 결 테두리 */
+            --border-wood-light: #6e4f37; /* 밝은 목판 테두리 */
+            --border-brass: #c29545;      /* 조선 황동 장석 포인트 */
+            --border-neon: #3b2a1e;
+
+            /* 오방색 재해석 사이버펑크 네온 */
+            --neon-cyan: #00f0ff;         /* 청(靑): 도깨비불 시안 네온 */
+            --neon-pink: #ff2a54;         /* 적(赤): 주홍 부적/혈투 네온 */
+            --neon-green: #39ff14;        /* 녹(綠): 취옥 방사능 네온 */
+            --neon-gold: #ffd000;         /* 황(黃): 황실 어보 골드 네온 */
+            --neon-purple: #c84bff;       /* 자(紫): 자수정 요술 네온 */
+
+            /* 대표 도트 폰트 */
+            --font-pixel: 'NeoDunggeunmo', 'DungGeunMo', monospace, sans-serif;
+        }
+
+        body.showcase-body {
+            background-color: var(--bg-deep);
+            color: #f4ece1;
+            font-family: var(--font-pixel);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+            /* 사이버펑크 도깨비불 네온 광원 + 조선 전통 창살(亞/격자) 문양 배경 */
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 60%, rgba(255, 42, 84, 0.07) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(255, 208, 0, 0.05) 0%, transparent 45%),
+                linear-gradient(rgba(194, 149, 69, 0.05) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(194, 149, 69, 0.05) 2px, transparent 2px),
+                linear-gradient(rgba(194, 149, 69, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(194, 149, 69, 0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px, 16px 16px, 16px 16px;
+        }
+
+        body.showcase-body button,
+        body.showcase-body input {
+            font-family: var(--font-pixel);
+        }
+
+        /* Top Nav Header (조선 현판 + 사이버 네온 스타일) */
+        .showcase-header {
+            background: #140f0c;
+            background-image: repeating-linear-gradient(
+                90deg,
+                rgba(255, 208, 0, 0.02) 0px,
+                rgba(255, 208, 0, 0.02) 2px,
+                transparent 2px,
+                transparent 12px
+            );
+            border-bottom: 4px solid var(--border-ink);
+            box-shadow: 
+                inset 0 -3px 0 var(--border-brass),
+                0 6px 0 rgba(0, 0, 0, 0.75),
+                0 0 20px rgba(0, 240, 255, 0.15);
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .showcase-title-group h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--neon-gold);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 
+                3px 3px 0px var(--border-ink),
+                0 0 12px rgba(255, 208, 0, 0.55);
+        }
+
+        .showcase-title-group p {
+            margin: 6px 0 0 0;
+            font-size: 0.82rem;
+            color: #d6c7b2;
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        .showcase-header-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 포리저/던그리드 탄성 + 조선 목판/창살/황동 두석 픽셀 탭 버튼 */
+        .btn-nav-tab {
+            background: #231912 url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 8px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 8px 10px / 0 round;
+            color: #f4ece1;
+            padding: 6px 14px;
+            font-size: 0.84rem;
+            border-radius: 0px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-shadow: 2px 2px 0px var(--border-ink);
+            filter: drop-shadow(0 4px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s, color 0.15s;
+        }
+
+        .btn-nav-tab:hover, .btn-nav-tab.active {
+            color: var(--neon-cyan);
+            transform: translateY(-3px) scale(1.04);
+            filter: drop-shadow(0 7px 0 var(--border-ink)) drop-shadow(0 0 10px rgba(0, 240, 255, 0.55));
+        }
+
+        .btn-nav-tab:active {
+            transform: translateY(2px) scale(0.97);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        .btn-play-game {
+            background: #8a162c !important;
+            color: var(--neon-gold) !important;
+            filter: drop-shadow(0 4px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(255, 42, 84, 0.55));
+        }
+
+        .btn-play-game:hover {
+            background: #b81d3a !important;
+            color: #ffffff !important;
+            filter: drop-shadow(0 7px 0 var(--border-ink)) drop-shadow(0 0 16px rgba(255, 208, 0, 0.75));
+        }
+
+        /* Container Layout */
+        .showcase-container {
+            max-width: 1540px;
+            margin: 28px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        /* ==========================================================================
+         * 🏮 Section Card: 정통 조선 조각 목판 + 전통 완자문/亞 창살 + 황동 두석 9-Slice 프레임
+         * ========================================================================== */
+        .showcase-card {
+            background-color: #1c1510;
+            border-style: solid;
+            border-width: 30px 36px;
+            border-image-source: url('assets/ui/ui_joseon_frame_cropped.png');
+            border-image-slice: 135 160 135 160 fill;
+            border-image-width: 30px 36px;
+            border-image-repeat: round;
+            border-radius: 0px;
+            padding: 14px 18px;
+            position: relative;
+            filter: drop-shadow(0 10px 0px var(--border-ink)) drop-shadow(0 0 24px rgba(0, 240, 255, 0.12));
+        }
+
+        .showcase-card::before,
+        .showcase-card::after {
+            display: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 14px;
+            background: rgba(12, 9, 7, 0.72);
+            border: 2px solid var(--border-wood-light);
+            border-left: 6px solid var(--neon-gold);
+            box-shadow: inset 0 0 0 1px var(--border-ink), 0 4px 0 var(--border-ink);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.22rem;
+            color: var(--neon-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 2px 2px 0px var(--border-ink), 0 0 10px rgba(255, 208, 0, 0.3);
+        }
+
+        .section-title span.badge-num {
+            background: var(--neon-cyan);
+            color: #050811;
+            font-size: 0.82rem;
+            font-weight: 900;
+            padding: 3px 9px;
+            border: 2px solid var(--border-ink);
+            border-radius: 0px;
+            box-shadow: 2px 2px 0px var(--border-ink);
+            text-shadow: none;
+        }
+
+        /* Studio Split Grid */
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .studio-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Hero Stage (한지 등롱 + 창살 조각 프레임 + 사이버 CRT 아바타 감실) */
+        .hero-stage-wrapper {
+            background-color: #090706;
+            background-image: 
+                radial-gradient(circle at 50% 60%, rgba(0, 240, 255, 0.16) 0%, transparent 65%),
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 16px 16px, 16px 16px;
+            border-style: solid;
+            border-width: 24px;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 24px / 0 round;
+            border-radius: 0px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            filter: drop-shadow(0 6px 0 var(--border-ink)) drop-shadow(0 0 16px rgba(0, 240, 255, 0.25));
+        }
+
+        .crt-scanlines {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            border-radius: 0px;
+            z-index: 10;
+        }
+
+        .hero-avatar-box-large {
+            width: 240px;
+            height: 240px;
+            position: relative;
+            margin: 10px 0;
+            image-rendering: pixelated;
+        }
+
+        .stage-badge-status {
+            background: #1a130e url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 6px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 6px 8px / 0 round;
+            padding: 4px 12px;
+            border-radius: 0px;
+            font-size: 0.76rem;
+            color: var(--neon-gold);
+            margin-bottom: 8px;
+            font-family: var(--font-pixel);
+            filter: drop-shadow(0 3px 0 var(--border-ink));
+            text-shadow: 1px 1px 0px var(--border-ink);
+            z-index: 12;
+        }
+
+        /* Animation Playback Controller */
+        .stage-playback-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #16100c url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 8px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 8px 10px / 0 round;
+            border-radius: 0px;
+            padding: 6px 8px;
+            margin-top: 12px;
+            gap: 6px;
+            z-index: 12;
+            flex-wrap: wrap;
+        }
+
+        .btn-ctrl {
+            background: #281e17 url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 6px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 6px 8px / 0 round;
+            color: #f4ece1;
+            padding: 4px 10px;
+            border-radius: 0px;
+            font-size: 0.76rem;
+            cursor: pointer;
+            text-shadow: 1px 1px 0px var(--border-ink);
+            filter: drop-shadow(0 3px 0 var(--border-ink));
+            transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.14s, color 0.14s;
+        }
+
+        .btn-ctrl:hover, .btn-ctrl.active {
+            background: #192930;
+            color: var(--neon-cyan);
+            transform: translateY(-2px) scale(1.05);
+            filter: drop-shadow(0 5px 0 var(--border-ink)) drop-shadow(0 0 8px rgba(0, 240, 255, 0.45));
+        }
+
+        .btn-ctrl:active {
+            transform: translateY(2px) scale(0.96);
+            filter: drop-shadow(0 1px 0 var(--border-ink));
+        }
+
+        .frame-indicator {
+            font-family: var(--font-pixel);
+            font-size: 0.76rem;
+            color: var(--neon-gold);
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        /* Studio Controls Panel */
+        .studio-controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .control-group-title {
+            font-size: 0.88rem;
+            color: var(--neon-gold);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 0px var(--border-ink);
+            background: rgba(14, 10, 8, 0.78);
+            border: 1px solid var(--border-wood-light);
+            border-left: 5px solid var(--neon-gold);
+            padding: 6px 10px;
+            box-shadow: 2px 2px 0 var(--border-ink);
+        }
+
+        .chip-buttons-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* 포리저/던그리드 탄성 + 조선 목판/창살 도트 칩 버튼 */
+        .btn-chip {
+            background: #231912 url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 8px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 8px 10px / 0 round;
+            color: #e5d8c5;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 0px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-shadow: 1px 1px 0px var(--border-ink);
+            filter: drop-shadow(0 4px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s, color 0.15s;
+        }
+
+        .btn-chip:hover {
+            color: var(--neon-gold);
+            transform: translateY(-3px) scale(1.04);
+            filter: drop-shadow(0 7px 0 var(--border-ink)) drop-shadow(0 0 8px rgba(255, 208, 0, 0.35));
+        }
+
+        .btn-chip:active {
+            transform: translateY(2px) scale(0.96);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        .btn-chip.active {
+            background: #12242c;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 4px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(0, 240, 255, 0.5));
+        }
+
+        /* 13 Mutations Checkbox Grid */
+        .mutation-toggles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .mutation-chk-item {
+            background: #1b140f url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 7px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 7px 9px / 0 round;
+            padding: 5px 8px;
+            border-radius: 0px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: #d6c7b2;
+            cursor: pointer;
+            user-select: none;
+            text-shadow: 1px 1px 0px var(--border-ink);
+            filter: drop-shadow(0 4px 0 var(--border-ink));
+            transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.14s;
+        }
+
+        .mutation-chk-item:hover {
+            transform: translateY(-2px) scale(1.02);
+            color: var(--neon-gold);
+            filter: drop-shadow(0 6px 0 var(--border-ink));
+        }
+
+        .mutation-chk-item.checked {
+            background: #13262e;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 4px 0 var(--border-ink)) drop-shadow(0 0 10px rgba(0, 240, 255, 0.4));
+        }
+
+        .mutation-chk-item input {
+            cursor: pointer;
+            accent-color: var(--neon-cyan);
+            width: 15px;
+            height: 15px;
+        }
+
+        /* Simulator Section (Slots & Synergy) */
+        .simulator-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-layout { grid-template-columns: 1fr; }
+        }
+
+        .slots-display-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        /* 조선 부적/목패(木牌) 창살 테두리 슬롯 박스 */
+        .slot-display-box {
+            background: #140f0b url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 14px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 14px / 0 round;
+            border-radius: 0px;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 136px;
+            text-align: center;
+            position: relative;
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+            transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.16s;
+        }
+
+        .slot-display-box.unlocked {
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+        }
+
+        .slot-display-box.equipped {
+            filter: drop-shadow(0 5px 0 var(--border-ink)) drop-shadow(0 0 14px rgba(0, 240, 255, 0.45));
+        }
+
+        .slot-display-box:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .slot-badge-num {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 0.7rem;
+            color: var(--border-brass);
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        .slot-btn-toggle {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #281e17;
+            border: 2px solid var(--border-ink);
+            color: #d6c7b2;
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 0px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .slot-btn-toggle:hover {
+            color: var(--neon-gold);
+            border-color: var(--neon-gold);
+        }
+
+        .slot-content-name {
+            font-size: 0.96rem;
+            color: var(--neon-gold);
+            margin-top: 12px;
+            text-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .slot-content-part {
+            font-size: 0.75rem;
+            color: var(--neon-cyan);
+            margin-top: 5px;
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        .slot-btn-unequip {
+            margin-top: 10px;
+            background: #7f1d1d;
+            border: 2px solid var(--border-ink);
+            color: #fecaca;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            border-radius: 0px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 var(--border-ink);
+            transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .slot-btn-unequip:hover {
+            background: var(--neon-pink);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Active Synergies Box (조선 창살 조각 패 + 한지 배경) */
+        .synergy-banner-box {
+            background: #140f0b url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 16px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 16px / 0 round;
+            border-radius: 0px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            filter: drop-shadow(0 6px 0 var(--border-ink));
+        }
+
+        .synergy-header {
+            font-size: 0.92rem;
+            color: var(--neon-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .fusion-active-card {
+            background: #142029;
+            border: 10px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 10px / 0 round;
+            border-radius: 0px;
+            padding: 12px;
+            filter: drop-shadow(0 4px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(0, 240, 255, 0.35));
+            animation: glow-pulse 3s infinite alternate;
+        }
+
+        .fusion-active-card.double-fusion-2 {
+            background: #221429;
+            filter: drop-shadow(0 4px 0 var(--border-ink)) drop-shadow(0 0 14px rgba(200, 75, 255, 0.45));
+        }
+
+        @keyframes glow-pulse {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.12); }
+        }
+
+        .fusion-card-title {
+            font-size: 0.96rem;
+            color: var(--neon-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .fusion-req-tags {
+            font-size: 0.74rem;
+            color: #d6c7b2;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .fusion-card-desc {
+            font-size: 0.82rem;
+            color: #f4ece1;
+            line-height: 1.5;
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        /* 13 Traits Palette (조선 부적/목패 창살 칩셋 그리드) */
+        .traits-palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 10px;
+        }
+
+        .trait-chip-card {
+            background: #1b140f url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 12px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 12px / 0 round;
+            border-radius: 0px;
+            padding: 8px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+        }
+
+        .trait-chip-card:hover {
+            transform: translateY(-4px) scale(1.04);
+            filter: drop-shadow(0 9px 0 var(--border-ink)) drop-shadow(0 0 10px rgba(255, 208, 0, 0.4));
+        }
+
+        .trait-chip-card:active {
+            transform: translateY(2px) scale(0.96);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        .trait-chip-card.slotted {
+            filter: drop-shadow(0 5px 0 var(--border-ink)) drop-shadow(0 0 14px rgba(0, 240, 255, 0.6));
+        }
+
+        .trait-chip-name {
+            font-size: 0.86rem;
+            color: #fff8eb;
+            margin: 5px 0 3px 0;
+            text-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .trait-chip-part {
+            font-size: 0.7rem;
+            color: var(--neon-cyan);
+            text-shadow: 1px 1px 0px var(--border-ink);
+        }
+
+        .trait-chip-cat {
+            font-size: 0.65rem;
+            color: var(--neon-gold);
+            background: #120d0a;
+            border: 1px solid var(--border-wood-light);
+            padding: 2px 6px;
+            border-radius: 0px;
+            margin-bottom: 4px;
+        }
+
+        /* 78 Fusions Matrix Section */
+        .fusions-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #100c09 url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 8px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 8px 10px / 0 round;
+            color: #fff8eb;
+            padding: 7px 12px 7px 36px;
+            border-radius: 0px;
+            font-size: 0.84rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-gold);
+            font-size: 0.88rem;
+        }
+
+        .fusions-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            max-height: 640px;
+            overflow-y: auto;
+            padding: 4px 8px 8px 2px;
+        }
+
+        /* Custom Pixel Scrollbar */
+        .fusions-cards-grid::-webkit-scrollbar,
+        .monster-gallery-scroll::-webkit-scrollbar { width: 10px; }
+        .fusions-cards-grid::-webkit-scrollbar-track,
+        .monster-gallery-scroll::-webkit-scrollbar-track {
+            background: #0d0907;
+            border: 2px solid var(--border-ink);
+        }
+        .fusions-cards-grid::-webkit-scrollbar-thumb,
+        .monster-gallery-scroll::-webkit-scrollbar-thumb {
+            background: var(--border-wood-light);
+            border: 2px solid var(--border-ink);
+        }
+        .fusions-cards-grid::-webkit-scrollbar-thumb:hover,
+        .monster-gallery-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-gold);
+        }
+
+        .fusion-catalog-card {
+            background: #1b140f url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 14px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 14px / 0 round;
+            border-radius: 0px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+        }
+
+        .fusion-catalog-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            filter: drop-shadow(0 8px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(255, 208, 0, 0.35));
+        }
+
+        .fusion-catalog-card.active-match {
+            filter: drop-shadow(0 5px 0 var(--border-ink)) drop-shadow(0 0 16px rgba(0, 240, 255, 0.55));
+        }
+
+        .btn-test-fusion {
+            margin-top: 12px;
+            background: #281d15 url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 6px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 6px 8px / 0 round;
+            color: var(--neon-cyan);
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            border-radius: 0px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-shadow: 1px 1px 0px var(--border-ink);
+            filter: drop-shadow(0 4px 0 var(--border-ink));
+            transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.14s, color 0.14s;
+        }
+
+        .btn-test-fusion:hover {
+            color: var(--neon-gold);
+            font-weight: 700;
+            transform: translateY(-2px) scale(1.03);
+            filter: drop-shadow(0 6px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(0, 240, 255, 0.55));
+        }
+
+        .btn-test-fusion:active {
+            transform: translateY(2px) scale(0.97);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        /* Monster Gallery & Tester Section */
+        .monster-showcase-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .monster-showcase-grid { grid-template-columns: 1fr; }
+        }
+
+        .monster-test-stage {
+            background-color: #090706;
+            background-image: 
+                radial-gradient(circle at 50% 60%, rgba(255, 42, 84, 0.14) 0%, transparent 65%),
+                linear-gradient(rgba(255, 42, 84, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 42, 84, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 16px 16px, 16px 16px;
+            border: 24px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 / 24px / 0 round;
+            border-radius: 0px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            filter: drop-shadow(0 6px 0 var(--border-ink)) drop-shadow(0 0 16px rgba(255, 42, 84, 0.25));
+        }
+
+        .monster-sprite-preview-box {
+            width: 140px;
+            height: 140px;
+            margin: 16px 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            image-rendering: pixelated;
+            transform: scaleX(-1); /* monsters face left towards hero */
+            transition: all 0.45s ease-out;
+        }
+
+        .monster-sprite-preview-box.defeated {
+            transform: scaleX(-1) translateY(20px) rotate(-90deg) scale(0.85) !important;
+            filter: grayscale(1) brightness(0.4) contrast(1.2) !important;
+            opacity: 0.45 !important;
+        }
+
+        .req-chip {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 0px;
+            border: 2px solid var(--border-ink);
+            background: #140f0c;
+            box-shadow: 2px 2px 0px var(--border-ink);
+            font-weight: 700;
+        }
+
+        .monster-gallery-scroll {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding: 4px 8px 8px 2px;
+        }
+
+        .monster-card-thumb {
+            background: #1b140f url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 12px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 12px / 0 round;
+            border-radius: 0px;
+            padding: 8px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+        }
+
+        .monster-card-thumb:hover, .monster-card-thumb.selected {
+            transform: translateY(-4px) scale(1.04);
+            filter: drop-shadow(0 8px 0 var(--border-ink)) drop-shadow(0 0 14px rgba(255, 42, 84, 0.55));
+        }
+
+        .monster-card-thumb:active {
+            transform: translateY(2px) scale(0.96);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        .monster-thumb-img {
+            width: 64px;
+            height: 64px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            image-rendering: pixelated;
+            margin-bottom: 6px;
+            transform: scaleX(-1); /* Face left */
+        }
+
+        .clean-badge {
+            background: var(--neon-green);
+            color: #031c05;
+            font-size: 0.64rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border: 1px solid var(--border-ink);
+            border-radius: 0px;
+            margin-top: 4px;
+            box-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        /* ==========================================================================
+         * SECTION 05: 마을(Town) · 월드맵(Eurasia) · 인게임 UI & 전체 에셋 쇼케이스
+         * ========================================================================== */
+        .ui-preview-stage-frame {
+            width: 100%;
+            height: 580px;
+            background: #0d0a08;
+            border: 26px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png') 135 160 135 160 / 26px 32px / 0 round;
+            filter: drop-shadow(0 8px 0 var(--border-ink)) drop-shadow(0 0 22px rgba(0, 240, 255, 0.18));
+            position: relative;
+            overflow: hidden;
+            margin-top: 14px;
+        }
+
+        .ui-scene-pane {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .ui-scene-pane.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1) 마을(Town) 라이브 프리뷰 */
+        .disp-town-canvas {
+            flex: 1;
+            width: 100%;
+            background: #120d0a url('assets/ui/regions/town_bg_2.png') no-repeat center center / cover;
+            position: relative;
+            overflow: hidden;
+            transition: background-image 0.25s ease;
+        }
+
+        .disp-town-overlay-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 55%, transparent 50%, rgba(8, 5, 4, 0.55) 100%);
+            pointer-events: none;
+        }
+
+        /* 조선 목판/창살 현판 + 사이버 네온 건물 핀 */
+        .disp-town-pin {
+            position: absolute;
+            background: #1a120d url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 12px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 12px 14px / 0 round;
+            padding: 6px 14px;
+            color: #fff8eb;
+            font-size: 0.92rem;
+            cursor: pointer;
+            text-shadow: 2px 2px 0px var(--border-ink);
+            filter: drop-shadow(0 6px 0 var(--border-ink)) drop-shadow(0 0 12px rgba(0, 0, 0, 0.85));
+            transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.16s;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .disp-town-pin .pin-sub {
+            font-size: 0.68rem;
+            color: var(--neon-cyan);
+        }
+
+        .disp-town-pin:hover {
+            color: var(--neon-gold);
+            transform: translateY(-5px) scale(1.06);
+            filter: drop-shadow(0 10px 0 var(--border-ink)) drop-shadow(0 0 18px rgba(255, 208, 0, 0.65));
+        }
+
+        .disp-town-pin:active {
+            transform: translateY(2px) scale(0.96);
+            filter: drop-shadow(0 2px 0 var(--border-ink));
+        }
+
+        .disp-town-hero-stand {
+            position: absolute;
+            left: 48%;
+            top: 52%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 12;
+        }
+
+        .disp-town-hero-tag {
+            background: rgba(16, 12, 9, 0.92);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            box-shadow: 3px 3px 0px var(--border-ink);
+            margin-top: 4px;
+        }
+
+        .disp-town-hud-bar {
+            height: 62px;
+            background: #16100c;
+            border-top: 4px solid var(--border-ink);
+            box-shadow: inset 0 2px 0 var(--border-wood);
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .disp-rad-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0d0a08;
+            border: 3px solid var(--border-ink);
+            box-shadow: inset 0 0 0 2px var(--neon-green), 3px 3px 0px var(--border-ink);
+            padding: 6px 14px;
+            color: var(--neon-green);
+            font-size: 0.9rem;
+        }
+
+        /* 2) 유라시아 전략 지도 라이브 프리뷰 */
+        .disp-map-canvas {
+            flex: 1;
+            width: 100%;
+            background: #0c1017 url('assets/ui/eurasia_map.png') no-repeat center center / cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .disp-map-pin {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: #221813;
+            border: 3px solid var(--border-ink);
+            color: #fff8eb;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 
+                inset 0 0 0 2px var(--border-brass),
+                0 4px 0 var(--border-ink);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s, background 0.15s;
+            z-index: 15;
+        }
+
+        .disp-map-pin:hover,
+        .disp-map-pin.active {
+            background: #122830;
+            color: var(--neon-cyan);
+            transform: translate(-50%, -62%) scale(1.22);
+            box-shadow: 
+                inset 0 0 0 2px var(--neon-cyan),
+                0 7px 0 var(--border-ink),
+                0 0 16px rgba(0, 240, 255, 0.65);
+            z-index: 30;
+        }
+
+        .disp-map-pin.boss-region {
+            background: #3b1019;
+            color: var(--neon-pink);
+            box-shadow: 
+                inset 0 0 0 2px var(--neon-pink),
+                0 4px 0 var(--border-ink),
+                0 0 12px rgba(255, 42, 84, 0.45);
+        }
+
+        .disp-map-info-drawer {
+            position: absolute;
+            right: 18px;
+            top: 18px;
+            bottom: 18px;
+            width: 345px;
+            background: rgba(24, 18, 14, 0.96) url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 18px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 18px / 0 round;
+            filter: drop-shadow(0 8px 0 var(--border-ink)) drop-shadow(0 0 20px rgba(0, 0, 0, 0.9));
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 25;
+        }
+
+        /* 3) 타이틀 시작 화면 라이브 프리뷰 */
+        .disp-title-canvas {
+            flex: 1;
+            width: 100%;
+            background: #0a0807 url('assets/ui/title_bg.png') no-repeat center center / cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .disp-title-plaque {
+            background: rgba(20, 14, 10, 0.92) url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 24px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png') 135 160 135 160 fill / 24px 30px / 0 round;
+            filter: drop-shadow(0 10px 0 var(--border-ink)) drop-shadow(0 0 28px rgba(0, 240, 255, 0.3));
+            padding: 24px 40px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 인게임 UI 모달 오버레이 프리뷰 (상점 / 인벤토리 / 능력치 / 승패 엠블럼) */
+        .disp-ui-modal-preview {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 5, 4, 0.82);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 20px;
+        }
+
+        .disp-ui-modal-preview.active {
+            display: flex;
+        }
+
+        .disp-modal-window {
+            width: 100%;
+            max-width: 580px;
+            background: #1a130e url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 22px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png') 135 160 135 160 fill / 22px 26px / 0 round;
+            filter: drop-shadow(0 10px 0 var(--border-ink)) drop-shadow(0 0 30px rgba(0, 240, 255, 0.3));
+            overflow: hidden;
+            animation: modalPopIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPopIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .disp-modal-top {
+            background: repeating-linear-gradient(
+                45deg,
+                #2a1d13 0px,
+                #2a1d13 12px,
+                #18110c 12px,
+                #18110c 24px
+            );
+            border-bottom: 3px solid var(--neon-gold);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .disp-modal-top h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: var(--neon-gold);
+            text-shadow: 2px 2px 0px var(--border-ink);
+        }
+
+        .disp-modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* 전체 UI & VFX 에셋 갤러리 그리드 */
+        .ui-assets-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .ui-asset-card {
+            background: #1b140f url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 14px solid transparent;
+            border-image: url('assets/ui/ui_hanji_card_cropped.png') 155 155 155 155 fill / 14px / 0 round;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            filter: drop-shadow(0 5px 0 var(--border-ink));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+        }
+
+        .ui-asset-card:hover {
+            transform: translateY(-4px) scale(1.03);
+            filter: drop-shadow(0 8px 0 var(--border-ink)) drop-shadow(0 0 15px rgba(255, 208, 0, 0.45));
+        }
+
+        .ui-asset-thumb-box {
+            width: 100%;
+            height: 118px;
+            background-color: #0b0806;
+            background-image: 
+                linear-gradient(45deg, #15100c 25%, transparent 25%),
+                linear-gradient(-45deg, #15100c 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #15100c 75%),
+                linear-gradient(-45deg, transparent 75%, #15100c 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+            border: 2px solid var(--border-ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+            padding: 4px;
+        }
+
+        .ui-asset-thumb-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        /* 원본 이미지 확대 라이트박스 */
+        .ui-lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 4, 3, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 32px;
+        }
+
+        .ui-lightbox-overlay.active {
+            display: flex;
+        }
+
+        .ui-lightbox-box {
+            background: #1a130e url('assets/ui/ui_hanji_center_tile.png') center / cover;
+            border: 24px solid transparent;
+            border-image: url('assets/ui/ui_joseon_frame_cropped.png') 135 160 135 160 fill / 24px 30px / 0 round;
+            filter: drop-shadow(0 12px 0 var(--border-ink)) drop-shadow(0 0 40px rgba(255, 208, 0, 0.35));
+            padding: 16px;
+            max-width: 980px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ui-lightbox-img-wrap {
+            width: 100%;
+            max-height: 70vh;
+            background: #080605;
+            border: 3px solid var(--border-ink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .ui-lightbox-img-wrap img {
+            max-width: 100%;
+            max-height: 64vh;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body class="showcase-body">
+
+    <!-- Top Navigation Header -->
+    <header class="showcase-header">
+        <div class="showcase-title-group">
+            <h1>🎮 PROJECT 2100: MASTER DISPLAY & SIMULATOR</h1>
+            <p>영웅 4대 액션 · 13대 고유 신체 변이 파츠 · 78대 초월 2중 융합 매트릭스 · 괴수 갤러리 통합 제어 센터</p>
+        </div>
+        <div class="showcase-header-nav">
+            <a href="#section-world-ui" class="btn-nav-tab active" style="color:var(--neon-gold);">🏮 마을 & 전체 UI 쇼케이스</a>
+            <a href="#section-hero" class="btn-nav-tab">👤 영웅 스튜디오</a>
+            <a href="#section-slots" class="btn-nav-tab">⚡ 특성 & 시너지</a>
+            <a href="#section-fusions" class="btn-nav-tab">📖 78대 융합 브라우저</a>
+            <a href="#section-monsters" class="btn-nav-tab">👾 괴수 모션 갤러리</a>
+            <a href="index.html" class="btn-nav-tab btn-play-game">▶ 게임 실행</a>
+        </div>
+    </header>
+
+    <div class="showcase-container">
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: 영웅 & 페이퍼돌 스튜디오 -->
+        <!-- ========================================== -->
+        <section class="showcase-card" id="section-hero">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">01</span>
+                    영웅 비주얼 & DNF 스켈레탈 4대 액션 페이퍼돌 스튜디오
+                </h2>
+                <span style="font-size: 0.8rem; color: #c8b69e;">무기 미착용 순수 베이스 + 독립 무기/방어구/13대 변이 파츠 오버레이</span>
+            </div>
+
+            <div class="studio-grid">
+                <!-- 좌측: 대형 CRT 아바타 스테이지 -->
+                <div class="hero-stage-wrapper">
+                    <div class="crt-scanlines"></div>
+                    <div class="stage-badge-status" id="stageStatusBadge">MALE | IDLE | FRAME 0/4</div>
+
+                    <div class="hero-avatar-box-large" id="displayAvatarContainer">
+                        <!-- 오라 이펙트 (2개 이상 장착 시 발동) -->
+                        <div class="character-aura-effect" id="disp-layer-aura"></div>
+
+                        <!-- 13대 돌연변이 파츠 레이어 (Z-Index 배치) -->
+                        <div class="pixel-paperdoll-layer layer-wings" id="disp-layer-wings"></div>
+                        <div class="pixel-paperdoll-layer layer-fairy_wings" id="disp-layer-fairy_wings"></div>
+                        <div class="pixel-paperdoll-layer layer-tail" id="disp-layer-tail"></div>
+                        <div class="pixel-paperdoll-layer layer-booster" id="disp-layer-booster"></div>
+                        <div class="pixel-paperdoll-layer layer-shell" id="disp-layer-shell"></div>
+                        <div class="pixel-paperdoll-layer layer-crystals" id="disp-layer-crystals"></div>
+                        <div class="pixel-paperdoll-layer layer-body" id="disp-layer-body"></div>
+                        <div class="pixel-paperdoll-layer layer-armor" id="disp-layer-armor"></div>
+                        <div class="pixel-paperdoll-layer layer-core" id="disp-layer-core"></div>
+                        <div class="pixel-paperdoll-layer layer-horns" id="disp-layer-horns"></div>
+                        <div class="pixel-paperdoll-layer layer-spikes" id="disp-layer-spikes"></div>
+                        <div class="pixel-paperdoll-layer layer-visor" id="disp-layer-visor"></div>
+                        <div class="pixel-paperdoll-layer layer-antennae" id="disp-layer-antennae"></div>
+                        <div class="pixel-paperdoll-layer layer-halo" id="disp-layer-halo"></div>
+                        <div class="pixel-paperdoll-layer layer-claws" id="disp-layer-claws"></div>
+                        <div class="pixel-paperdoll-layer layer-weapon" id="disp-layer-weapon"></div>
+                        <div class="pixel-paperdoll-layer layer-vfx" id="disp-layer-vfx"></div>
+                    </div>
+
+                    <!-- 애니메이션 재생 제어바 -->
+                    <div class="stage-playback-bar">
+                        <button class="btn-ctrl" id="btnPlayPause">⏸ 일시정지</button>
+                        <button class="btn-ctrl" id="btnStepFrame">⏭ 1프레임</button>
+                        <span class="frame-indicator" id="playbackSpeedText">속도: 1.0x</span>
+                        <div style="display:flex; gap:4px;">
+                            <button class="btn-ctrl speed-btn" data-speed="0.5">0.5x</button>
+                            <button class="btn-ctrl speed-btn active" data-speed="1.0">1.0x</button>
+                            <button class="btn-ctrl speed-btn" data-speed="2.0">2.0x</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 우측: 컨트롤 패널 -->
+                <div class="studio-controls-panel">
+                    <!-- 성별 & 액션 모션 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div class="control-group-title">👤 요원 외형 & 각성 (Character)</div>
+                            <div class="chip-buttons-row">
+                                <button class="btn-chip active" id="btnGenderMale" data-gender="male">👦 남성 요원</button>
+                                <button class="btn-chip" id="btnGenderFemale" data-gender="female">👧 여성 요원</button>
+                                <button class="btn-chip" id="btnGenderMaleNem" data-gender="male_nemesis">😈 각성 네메시스(남)</button>
+                                <button class="btn-chip" id="btnGenderFemaleNem" data-gender="female_nemesis">😈 각성 네메시스(여)</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="control-group-title">🎬 액션 모션 (Skeletal Motions)</div>
+                            <div class="chip-buttons-row">
+                                <button class="btn-chip active" data-motion="idle">대기 (Idle - 4F)</button>
+                                <button class="btn-chip" data-motion="run">달리기 (Run - 6F)</button>
+                                <button class="btn-chip" data-motion="attack">공격 돌진 (Attack - 4F)</button>
+                                <button class="btn-chip" data-motion="skill">필살 스킬 (Skill - 4F)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 무기 & 방어구 오버레이 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div class="control-group-title">⚔️ 장착 무기 (Weapon Layer)</div>
+                            <div class="chip-buttons-row" id="weaponSelectorRow">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <div>
+                            <div class="control-group-title">🛡️ 장착 방어구 (Armor Layer)</div>
+                            <div class="chip-buttons-row" id="armorSelectorRow">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 오라 효과 제어 -->
+                    <div>
+                        <div class="control-group-title">✨ 특성 발현 오라 제어 (Aura Effect)</div>
+                        <div class="chip-buttons-row">
+                            <button class="btn-chip active" data-aura="auto">🔄 자동 (장착 슬롯 수 연동)</button>
+                            <button class="btn-chip" data-aura="0">OFF (오라 끄기)</button>
+                            <button class="btn-chip" data-aura="1">Stage 1: 청록 방사능 스월 (2특성)</button>
+                            <button class="btn-chip" data-aura="2">Stage 2: 진홍 코스믹 폭주 (3특성)</button>
+                        </div>
+                    </div>
+
+                    <!-- 13대 고유 신체 변이 파츠 수동 토글 -->
+                    <div>
+                        <div class="control-group-title" style="justify-content: space-between;">
+                            <span>🧬 13대 고유 신체 변이 파츠 (13 Mutation Parts)</span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn-ctrl" id="btnSyncPartsWithSlots">🔄 슬롯 동기화</button>
+                                <button class="btn-ctrl" id="btnAllPartsOn">전체 켜기</button>
+                                <button class="btn-ctrl" id="btnAllPartsOff">전체 끄기</button>
+                            </div>
+                        </div>
+                        <div class="mutation-toggles-grid" id="mutationsToggleGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: 3-특성 슬롯 & 실시간 시너지 엔진 -->
+        <!-- ========================================== -->
+        <section class="showcase-card" id="section-slots">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">02</span>
+                    3-특성 슬롯 해금 & 더블 2중 융합 시너지 엔진
+                </h2>
+                <span style="font-size: 0.8rem; color: #c8b69e;">1슬롯(시작) · 2슬롯(2마을 해금) · 3슬롯(3마을 해금) 및 [1+2] & [2+3] 더블 융합</span>
+            </div>
+
+            <div class="simulator-layout">
+                <!-- 좌측: 슬롯 장착 및 시너지 실시간 상태 -->
+                <div>
+                    <div class="control-group-title">🎯 현재 장착된 특성 슬롯 (3 Slots)</div>
+                    <div class="slots-display-row">
+                        <!-- Slot 1 -->
+                        <div class="slot-display-box unlocked equipped" id="slotCard0">
+                            <span class="slot-badge-num">SLOT 1 (기본)</span>
+                            <div class="slot-content-name" id="slotName0">신체 변이</div>
+                            <div class="slot-content-part" id="slotPart0">흑요석 뿔 (horns)</div>
+                            <button class="slot-btn-unequip" id="btnUnequip0" onclick="unequipSlot(0)">해제</button>
+                        </div>
+
+                        <!-- Slot 2 -->
+                        <div class="slot-display-box unlocked" id="slotCard1">
+                            <span class="slot-badge-num">SLOT 2</span>
+                            <button class="slot-btn-toggle" id="btnToggleLock1" onclick="toggleSlotLock(1)">해금됨</button>
+                            <div class="slot-content-name" id="slotName1" style="color:#64748b;">+ 빈 슬롯</div>
+                            <div class="slot-content-part" id="slotPart1">특성 클릭하여 장착</div>
+                            <button class="slot-btn-unequip" id="btnUnequip1" onclick="unequipSlot(1)" style="display:none;">해제</button>
+                        </div>
+
+                        <!-- Slot 3 -->
+                        <div class="slot-display-box unlocked" id="slotCard2">
+                            <span class="slot-badge-num">SLOT 3</span>
+                            <button class="slot-btn-toggle" id="btnToggleLock2" onclick="toggleSlotLock(2)">해금됨</button>
+                            <div class="slot-content-name" id="slotName2" style="color:#64748b;">+ 빈 슬롯</div>
+                            <div class="slot-content-part" id="slotPart2">특성 클릭하여 장착</div>
+                            <button class="slot-btn-unequip" id="btnUnequip2" onclick="unequipSlot(2)" style="display:none;">해제</button>
+                        </div>
+                    </div>
+
+                    <!-- 실시간 융합 시너지 발동 상태 박스 -->
+                    <div class="synergy-banner-box" id="synergyBannerBox">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- 우측: 13대 특성 장착 팔레트 -->
+                <div>
+                    <div class="control-group-title" style="justify-content: space-between;">
+                        <span>🧩 13대 고유 특성 칩셋 팔레트 (클릭하여 장착/해제)</span>
+                        <span style="font-size: 0.7rem; color: #64748b;">각 특성마다 고유 신체 파츠 1:1 매핑</span>
+                    </div>
+                    <div class="traits-palette-grid" id="traitsPaletteGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: 78대 초월 융합 매트릭스 브라우저 -->
+        <!-- ========================================== -->
+        <section class="showcase-card" id="section-fusions">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">03</span>
+                    전 78대 초월 2중 융합 매트릭스 & 원클릭 시험기
+                </h2>
+                <span style="font-size: 0.8rem; color: #c8b69e;">13개 특성으로 구성된 78개 (13C2) 융합 실전 엔진 전수 가동</span>
+            </div>
+
+            <!-- 검색 및 카테고리 필터 바 -->
+            <div class="fusions-filter-bar">
+                <div class="chip-buttons-row" id="fusionFilterChips">
+                    <button class="btn-chip active" data-cat="all">전체 융합 (78)</button>
+                    <button class="btn-chip" data-cat="atk">⚔️ 공격/치명타/방관</button>
+                    <button class="btn-chip" data-cat="def">🛡️ 방어/보호막/경감</button>
+                    <button class="btn-chip" data-cat="hit">⚡ 연타/가속/기절</button>
+                    <button class="btn-chip" data-cat="skill">✨ 요정/스킬/도트</button>
+                    <button class="btn-chip" data-cat="rad">☣️ 방사능/반사/부활</button>
+                </div>
+                <div class="search-box-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="fusionSearchInput" placeholder="융합명, 특성 이름, 효과 검색...">
+                </div>
+            </div>
+
+            <!-- 78개 융합 카드 그리드 -->
+            <div class="fusions-cards-grid" id="fusionsCardsGrid">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 4: 괴수 도감 & 실시간 모션 테스터 -->
+        <!-- ========================================== -->
+        <section class="showcase-card" id="section-monsters">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">04</span>
+                    괴수 도감 & 실시간 액션 테스터 (모션 플립 버그 수정 & 텍스트 제거)
+                </h2>
+                <span style="font-size: 0.8rem; color: #c8b69e;">전 14개 지역 괴수 영웅 방향(좌측) 정렬 및 카드 뒤집힘 방지 검증</span>
+            </div>
+
+            <div class="monster-showcase-grid">
+                <!-- 좌측: 선택 괴수 실시간 액션 테스트 스테이지 -->
+                <div class="monster-test-stage">
+                    <div style="font-size: 0.74rem; color: var(--neon-gold); font-family: var(--font-pixel);">SELECTED MONSTER ACTION TEST</div>
+                    <div class="slot-content-name" id="testMonsterName" style="color:var(--neon-pink); margin-top:4px;">그레이트 울프 [보스]</div>
+                    
+                    <div class="actor-card monster-card" id="demoMonsterWrapper" style="margin: 14px 0;">
+                        <div class="actor-hp-container">
+                            <div class="hp-label" id="demoMonsterLabel">HP: 550 / 550</div>
+                            <div class="hp-bar-outer" style="width: 140px;">
+                                <div class="hp-bar-inner monster-hp" id="demoMonsterHpBar" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="monster-sprite-preview-box" id="demoMonsterSprite"></div>
+                    </div>
+
+                    <!-- 액션 테스트 버튼 -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                        <button class="btn-ctrl" id="btnTestLunge" style="padding: 8px;">⚔️ 공격 돌진 (Lunge: -75px 카드 플립 없음)</button>
+                        <button class="btn-ctrl" id="btnTestKnockback" style="padding: 8px;">💥 피격 넉백 (Knockback: +28px 반동)</button>
+                        <button class="btn-ctrl" id="btnTestDefeat" style="padding: 8px;">💀 전투 불능 (Defeat: 90도 전도 회색화)</button>
+                        <button class="btn-ctrl" id="btnTestReset" style="padding: 8px; background:#201711; border-color:var(--border-ink);">🔄 상태 초기화</button>
+                    </div>
+
+                    <!-- 섀도우 배트 클리닝 완료 안내 -->
+                    <div style="margin-top: 14px; background: #0e1f14; border: 2px solid var(--border-ink); box-shadow: inset 0 0 0 1px var(--neon-green), 3px 3px 0px var(--border-ink); border-radius: 0px; padding: 8px 12px; font-size: 0.72rem; color: var(--neon-green); text-align: center;">
+                        ✅ 4지역 섀도우 배트 (m_4_2) 하단 텍스트 아티팩트 제거 완료
+                    </div>
+                </div>
+
+                <!-- 우측: 14개 지역 괴수 갤러리 -->
+                <div>
+                    <div class="control-group-title" style="justify-content: space-between;">
+                        <span>👾 14개 지역 괴수 목록 (클릭하여 시험대에 올리기)</span>
+                        <div class="chip-buttons-row" id="monsterRegionFilter">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div class="monster-gallery-scroll" id="monsterGalleryScroll">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 5: 마을 · 월드맵 · 인게임 UI & 전체 에셋 쇼케이스 -->
+        <!-- ========================================== -->
+        <section class="showcase-card" id="section-world-ui">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">05</span>
+                    마을(Town) · 유라시아 월드맵 · 인게임 UI 모달 & 전체 그래픽 에셋 도감
+                </h2>
+                <span style="font-size: 0.8rem; color: #c8b69e;">조선 목판/한지 + 사이버펑크 네온 + 포리저 픽셀 보더가 적용된 인게임 4대 화면 및 전체 UI 원본 이미지</span>
+            </div>
+
+            <!-- 상단: 4대 인게임 씬 전환 탭 & 모달 바로가기 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div class="chip-buttons-row" id="uiSceneTabs">
+                    <button class="btn-chip active" data-uiscene="town">🏪 1. 생존자 마을 (Town UI)</button>
+                    <button class="btn-chip" data-uiscene="map">🗺️ 2. 유라시아 전략 지도 (World Map)</button>
+                    <button class="btn-chip" data-uiscene="title">🏮 3. 타이틀 시작 화면 (Title Screen)</button>
+                    <button class="btn-chip" data-uiscene="battle">⚔️ 4. 전투 HUD & VFX 시험장</button>
+                </div>
+
+                <div class="chip-buttons-row">
+                    <span style="font-size: 0.76rem; color: var(--neon-gold); align-self: center; margin-right: 4px;">🪟 인게임 창 미리보기:</span>
+                    <button class="btn-ctrl" onclick="openUiPreviewModal('shop')">🏪 보급 상점창</button>
+                    <button class="btn-ctrl" onclick="openUiPreviewModal('inventory')">🎒 장비/인벤토리창</button>
+                    <button class="btn-ctrl" onclick="openUiPreviewModal('stats')">📊 능력치 연마창</button>
+                    <button class="btn-ctrl" onclick="openUiPreviewModal('victory')">🏆 승리 오버레이</button>
+                    <button class="btn-ctrl" onclick="openUiPreviewModal('defeat')">💀 패배 오버레이</button>
+                </div>
+            </div>
+
+            <!-- 중앙: 인게임 화면 라이브 스테이지 프레임 -->
+            <div class="ui-preview-stage-frame">
+                <div class="crt-scanlines"></div>
+
+                <!-- [SCENE A] 생존자 마을 화면 (town_map.png) -->
+                <div class="ui-scene-pane active" id="ui-pane-town">
+                    <div class="disp-town-canvas">
+                        <div class="disp-town-overlay-vignette"></div>
+
+                        <!-- 상단 현판 안내 배너 -->
+                        <div style="position: absolute; top: 14px; left: 16px; background: rgba(18, 13, 10, 0.92); border: 3px solid var(--border-ink); box-shadow: inset 0 0 0 2px var(--border-brass), 4px 4px 0 var(--border-ink); padding: 8px 14px; z-index: 15;">
+                            <div style="font-size: 0.96rem; color: var(--neon-gold); text-shadow: 2px 2px 0 #000;">🏯 조선 아포칼립스 안전 거점: 생존자 마을</div>
+                            <div style="font-size: 0.72rem; color: #d6c7b2; margin-top: 2px;">건물 현판이나 하단 버튼을 클릭하면 목판+네온 UI 모달창이 열립니다.</div>
+                        </div>
+
+                        <!-- 마을 건물 핀 1: 상점 -->
+                        <div class="disp-town-pin" style="left: 16%; top: 38%;" onclick="openUiPreviewModal('shop')">
+                            <span>🏪 만물 보급 상점</span>
+                            <span class="pin-sub">[클릭하여 상점 UI 열기]</span>
+                        </div>
+
+                        <!-- 마을 건물 핀 2: 특성 진화소 -->
+                        <div class="disp-town-pin" style="right: 16%; top: 32%;" onclick="document.getElementById('section-slots').scrollIntoView({behavior:'smooth'})">
+                            <span>🧪 유전자 특성 진화소</span>
+                            <span class="pin-sub">[13대 변이 & 78종 융합]</span>
+                        </div>
+
+                        <!-- 마을 건물 핀 3: 월드맵 이동 -->
+                        <div class="disp-town-pin" style="left: 22%; bottom: 16%;" onclick="switchUiScene('map')">
+                            <span>🗺️ 유라시아 작전 지도</span>
+                            <span class="pin-sub">[클릭하여 월드맵 보기]</span>
+                        </div>
+
+                        <!-- 마을 중앙 요원 아바타 (Section 1 스튜디오와 자동 동기화) -->
+                        <div class="disp-town-hero-stand">
+                            <div id="dispTownHeroClone" style="width: 150px; height: 150px; position: relative;"></div>
+                            <div class="disp-town-hero-tag">⚡ 생존 특무요원 (스튜디오 외형 연동)</div>
+                        </div>
+                    </div>
+
+                    <!-- 마을 하단 HUD 바 -->
+                    <div class="disp-town-hud-bar">
+                        <div class="disp-rad-badge">
+                            <img src="assets/ui/item_rad_ore.png" style="width: 26px; height: 26px; image-rendering: pixelated;" alt="Rad">
+                            <span>보유 방사능 광석: <strong>1,250 Rad</strong></span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-chip" onclick="openUiPreviewModal('inventory')">🎒 인벤토리 & 장착</button>
+                            <button class="btn-chip" onclick="openUiPreviewModal('stats')">📊 영구 능력치 훈련</button>
+                            <button class="btn-chip" onclick="openUiPreviewModal('shop')" style="color: var(--neon-gold);">🏪 상점 열기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- [SCENE B] 유라시아 전략 지도 (eurasia_map.png) -->
+                <div class="ui-scene-pane" id="ui-pane-map">
+                    <div class="disp-map-canvas" id="dispEurasiaMapCanvas">
+                        <div style="position: absolute; top: 14px; left: 16px; background: rgba(18, 13, 10, 0.92); border: 3px solid var(--border-ink); box-shadow: inset 0 0 0 2px var(--neon-cyan), 4px 4px 0 var(--border-ink); padding: 8px 14px; z-index: 20;">
+                            <div style="font-size: 0.96rem; color: var(--neon-cyan); text-shadow: 2px 2px 0 #000;">🗺️ 유라시아 전역 14대 작전 지도</div>
+                            <div style="font-size: 0.72rem; color: #d6c7b2; margin-top: 2px;">지도 위 1~14번 작전 핀을 클릭하면 우측 목판 브리핑 창이 갱신됩니다.</div>
+                        </div>
+
+                        <!-- 동적 생성되는 14개 지역 핀 컨테이너 -->
+                        <div id="dispMapPinsLayer"></div>
+
+                        <!-- 우측 지역 정보 목판 브리핑 카드 -->
+                        <div class="disp-map-info-drawer" id="dispMapInfoDrawer">
+                            <!-- JS로 동적 렌더링 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- [SCENE C] 타이틀 시작 화면 (title_bg.png) -->
+                <div class="ui-scene-pane" id="ui-pane-title">
+                    <div class="disp-title-canvas">
+                        <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.35) 0%, rgba(10, 7, 5, 0.85) 100%);"></div>
+                        <div class="disp-title-plaque">
+                            <span style="background: #132620; border: 2px solid var(--neon-green); color: var(--neon-green); padding: 4px 14px; font-size: 0.85rem; box-shadow: 3px 3px 0 var(--border-ink);">
+                                🏮 조선 아포칼립스 2D 도트 RPG
+                            </span>
+                            <h1 style="margin: 4px 0; font-size: 3.1rem; color: var(--neon-gold); text-shadow: 4px 4px 0 var(--border-ink), 0 0 20px rgba(255, 208, 0, 0.6); letter-spacing: 2px;">
+                                🧬 PROJECT 2100
+                            </h1>
+                            <div style="width: 180px; height: 6px; background: var(--neon-cyan); border: 2px solid var(--border-ink); box-shadow: 0 0 12px var(--neon-cyan);"></div>
+                            <p style="margin: 6px 0 10px 0; font-size: 0.85rem; color: #e5d8c5; text-shadow: 2px 2px 0 #000;">
+                                유라시아 전역에서 살아남아 13대 변이를 각성하고 네메시스를 소환하십시오.
+                            </p>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn-nav-tab btn-play-game" style="font-size: 1.05rem; padding: 12px 28px;" onclick="switchUiScene('town')">
+                                    ▶ 작전 개시 (마을 진입)
+                                </button>
+                                <button class="btn-nav-tab" style="font-size: 0.95rem; padding: 12px 20px;" onclick="switchUiScene('map')">
+                                    🗺️ 월드맵 미리보기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- [SCENE D] 전투 HUD & 16비트 VFX 시험장 -->
+                <div class="ui-scene-pane" id="ui-pane-battle">
+                    <div style="flex: 1; display: flex; flex-direction: column; padding: 16px 22px; background: radial-gradient(circle at 50% 45%, #1d1510 0%, #090705 100%); position: relative;">
+                        <!-- 전투 상단 HUD -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 3px dashed var(--border-wood-light); z-index: 15;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 1.05rem; color: var(--neon-gold); text-shadow: 2px 2px 0 #000;" id="dispBattleRegionTitle">⚔️ 지역 1: 시베리아 대황무지</span>
+                                <span style="background: var(--neon-cyan); color: #050811; font-weight: 900; font-size: 0.76rem; padding: 3px 10px; border: 2px solid var(--border-ink); box-shadow: 2px 2px 0 var(--border-ink);">WAVE 6/6 [BOSS]</span>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn-ctrl" onclick="triggerDispBattleVfx('assets/pixel_vfx/vfx_slash_arc.png', '⚡ 참격 파동 (Slash Arc) 발동!')">🗡️ 참격 VFX</button>
+                                <button class="btn-ctrl" onclick="triggerDispBattleVfx('assets/pixel_vfx/vfx_axe_spin.png', '🪓 회전 도끼 (Axe Spin) 투척!')">🪓 도끼 VFX</button>
+                                <button class="btn-ctrl" onclick="triggerDispBattleVfx('assets/pixel_vfx/vfx_laser_bolt.png', '🔋 고출력 레이저 볼트 발사!')">🔋 레이저 VFX</button>
+                                <button class="btn-ctrl" onclick="triggerDispBattleVfx('assets/pixel_vfx/vfx_nemesis_burst.png', '😈 네메시스 초월 폭풍 작렬!')">😈 네메시스 VFX</button>
+                            </div>
+                        </div>
+
+                        <!-- 전투 필드 (좌: 요원 우향 / 우: 몬스터 3기 좌향) -->
+                        <div style="flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 0 70px; position: relative;">
+                            <!-- 좌측 요원 -->
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <div style="font-size: 0.72rem; color: var(--neon-green); margin-bottom: 3px;">AGENT [HP 1000/1000]</div>
+                                <div style="width: 110px; height: 10px; background: #120d0a; border: 2px solid var(--border-ink); margin-bottom: 6px;">
+                                    <div style="width: 100%; height: 100%; background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green);"></div>
+                                </div>
+                                <div id="dispBattleHeroClone" style="width: 145px; height: 145px; position: relative;"></div>
+                            </div>
+
+                            <!-- 중앙 VFX 연출 레이어 -->
+                            <div id="dispBattleVfxBox" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 170px; height: 170px; pointer-events: none; display: flex; align-items: center; justify-content: center; z-index: 30;"></div>
+
+                            <!-- 우측 몬스터 3마리 파티 -->
+                            <div style="display: flex; gap: 22px; align-items: flex-end;" id="dispBattleMonsterParty">
+                                <!-- JS로 렌더링 -->
+                            </div>
+                        </div>
+
+                        <!-- 하단 도트 콘솔 로그 & 버튼 -->
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: stretch; z-index: 15;">
+                            <div id="dispBattleLogBox" style="background: #0b0806; border: 3px solid var(--border-ink); box-shadow: inset 0 0 0 2px var(--border-wood); padding: 8px 12px; font-size: 0.76rem; color: var(--neon-cyan); display: flex; align-items: center;">
+                                ▶ [전투 대기] 상단 VFX 버튼을 눌러 16비트 타격 이펙트와 전투 UI를 시험해 보십시오.
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-chip" onclick="openUiPreviewModal('inventory')">🎒 인벤토리</button>
+                                <button class="btn-chip" onclick="openUiPreviewModal('victory')" style="color: var(--neon-gold);">🏆 승리 팝업</button>
+                                <button class="btn-chip" onclick="openUiPreviewModal('defeat')" style="color: var(--neon-pink);">💀 패배 팝업</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 인게임 모달 오버레이 미리보기 컨테이너 -->
+                <div class="disp-ui-modal-preview" id="dispUiModalOverlay" onclick="if(event.target===this) closeUiPreviewModal()">
+                    <div class="disp-modal-window" id="dispUiModalWindow">
+                        <!-- JS로 모달 내용 주입 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단: 전체 UI · 배경 · 아이콘 · VFX 이미지 원본 도감 (클릭 시 확대) -->
+            <div style="margin-top: 28px;">
+                <div class="control-group-title" style="justify-content: space-between;">
+                    <span>🖼️ 게임 내 전체 UI · 배경 · 아이템 아이콘 · VFX 원본 이미지 도감 (총 16종 — 클릭 시 원본 확대)</span>
+                    <span style="font-size: 0.74rem; color: var(--neon-cyan);">assets/ui/* 및 assets/pixel_vfx/* 전수 수록</span>
+                </div>
+                <div class="ui-assets-gallery-grid" id="uiAssetsGalleryGrid">
+                    <!-- JS로 16종 에셋 렌더링 -->
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 원본 이미지 확대 라이트박스 -->
+    <div class="ui-lightbox-overlay" id="uiLightboxOverlay" onclick="if(event.target===this) closeUiLightbox()">
+        <div class="ui-lightbox-box">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div id="uiLightboxTitle" style="font-size: 1.15rem; color: var(--neon-gold);">에셋 제목</div>
+                    <div id="uiLightboxPath" style="font-size: 0.76rem; color: var(--neon-cyan); margin-top: 2px;">assets/ui/...</div>
+                </div>
+                <button class="btn-ctrl" onclick="closeUiLightbox()" style="font-size: 0.85rem; padding: 6px 14px;">✖ 닫기</button>
+            </div>
+            <div class="ui-lightbox-img-wrap">
+                <img id="uiLightboxImg" src="" alt="Preview">
+            </div>
+        </div>
+    </div>
+
+    <!-- Data & Controller Scripts -->
+    <script src="display_data.js"></script>
+    <script src="display.js"></script>
+    <script>
+        // =========================================================================
+        // SECTION 05 전용 컨트롤러: 마을 · 월드맵 · 인게임 UI 모달 & 전체 UI 에셋 도감
+        // =========================================================================
+        const DISPLAY_REGIONS_META = {
+            1: { name: "시베리아 대황무지", env: "지독한 혹한과 방사능이 섞인 설원", trait: "body_mutation", coords: { x: 64, y: 26 } },
+            2: { name: "서유럽 원전 지대", env: "고농도 방사능 데드존 및 슬러지 지대", trait: "energy_discharge", coords: { x: 22, y: 42 } },
+            3: { name: "동아시아 메가시티", env: "데이터 잔해와 오작동 보안 기계 구역", trait: "sensory_tech", coords: { x: 82, y: 52 } },
+            4: { name: "루마니아", env: "피와 전력을 갈구하는 밤의 약탈자 지대", trait: "blood_absorption", coords: { x: 35, y: 46 } },
+            5: { name: "이집트", env: "세포 변이로 썩지 않는 미라 무덤 유적", trait: "cellular_shield", coords: { x: 36, y: 68 } },
+            6: { name: "영국", env: "푸르고 보랏빛 낙진이 가득한 요정 황무지", trait: "fairy_magic", coords: { x: 16, y: 34 } },
+            7: { name: "몽골", env: "방사능 거대마와 신체를 결합한 기병대", trait: "power_overload", coords: { x: 70, y: 44 } },
+            8: { name: "중동 유전지대", env: "유전 폭발로 100년째 불타오르는 화염 대지", trait: "thermal_control", coords: { x: 46, y: 62 } },
+            9: { name: "그리스 지중해", env: "해수면 상승으로 잠긴 초음파 해양 괴물 구역", trait: "ultrasonic_disruption", coords: { x: 31, y: 56 } },
+            10: { name: "북유럽 오로라숲", env: "EMP 폭풍과 버서커 세력이 지배하는 숲", trait: "berserker_madness", coords: { x: 27, y: 22 } },
+            11: { name: "인도 오염 사원", env: "오염도가 극에 달한 삼두우 오염 숭배지", trait: "radiation_assimilation", coords: { x: 62, y: 68 } },
+            12: { name: "체르노빌 수색지", env: "원전 폭발 중심부의 극위험 파밍 구역", trait: "meltdown_control", coords: { x: 39, y: 36 } },
+            13: { name: "스위스 벙커", env: "인간성을 버린 기계 보초병 부대 수용소", trait: "hightech_engineering", coords: { x: 25, y: 47 } },
+            14: { name: "에베레스트 산맥", env: "7성 거수 빅풋이 지배하는 세계의 끝", trait: "nemesis", coords: { x: 66, y: 56 } }
+        };
+
+        const ALL_UI_ASSETS = [
+            { title: "생존자 마을 배경 (Town Map)", path: "assets/ui/town_map.png", tag: "마을 배경 (Screen 4)" },
+            { title: "유라시아 전략 지도 (Eurasia Map)", path: "assets/ui/eurasia_map.png", tag: "월드맵 배경 (Screen 2)" },
+            { title: "타이틀 시작 배경 (Title BG)", path: "assets/ui/title_bg.png", tag: "시작 화면 (Screen 1)" },
+            { title: "특성 카드 배경 (Trait Card BG)", path: "assets/ui/trait_card_bg.png", tag: "UI 카드 텍스처" },
+            { title: "전투 승리 엠블럼 (Victory Emblem)", path: "assets/ui/emblem_victory.png", tag: "클리어 결산 UI" },
+            { title: "전투 패배 엠블럼 (Defeat Emblem)", path: "assets/ui/emblem_defeat.png", tag: "패배 결산 UI" },
+            { title: "무기 아이템 아이콘 (Weapon)", path: "assets/ui/item_weapon.png", tag: "인벤토리/상점 UI" },
+            { title: "방어구 아이템 아이콘 (Armor)", path: "assets/ui/item_armor.png", tag: "인벤토리/상점 UI" },
+            { title: "특수장비 아이콘 (Accessory)", path: "assets/ui/item_accessory.png", tag: "인벤토리/상점 UI" },
+            { title: "방사능 광석 (Rad Ore)", path: "assets/ui/item_rad_ore.png", tag: "핵심 재화 아이콘" },
+            { title: "유전자 특성 칩셋 (Trait Chip)", path: "assets/ui/item_trait_chip.png", tag: "특성 연구소 아이콘" },
+            { title: "참격 파동 (Slash Arc VFX)", path: "assets/pixel_vfx/vfx_slash_arc.png", tag: "전투 투사체 VFX" },
+            { title: "회전 도끼 (Axe Spin VFX)", path: "assets/pixel_vfx/vfx_axe_spin.png", tag: "전투 투사체 VFX" },
+            { title: "레이저 볼트 (Laser Bolt VFX)", path: "assets/pixel_vfx/vfx_laser_bolt.png", tag: "전투 투사체 VFX" },
+            { title: "네메시스 버스트 (Nemesis VFX)", path: "assets/pixel_vfx/vfx_nemesis_burst.png", tag: "초월 필살기 VFX" },
+            { title: "피격 폭발 스파크 (Hit Burst VFX)", path: "assets/pixel_vfx/vfx_hit_burst.png", tag: "타격 이펙트 VFX" }
+        ];
+
+        let selectedPreviewRegion = 1;
+
+        function switchUiScene(sceneKey) {
+            document.querySelectorAll('#uiSceneTabs .btn-chip').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-uiscene') === sceneKey);
+            });
+            document.querySelectorAll('.ui-scene-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            const target = document.getElementById('ui-pane-' + sceneKey);
+            if (target) target.classList.add('active');
+            closeUiPreviewModal();
+        }
+
+        function syncHeroAvatarToScenes() {
+            const srcContainer = document.getElementById('displayAvatarContainer');
+            const townDest = document.getElementById('dispTownHeroClone');
+            const battleDest = document.getElementById('dispBattleHeroClone');
+            if (!srcContainer) return;
+            if (townDest) townDest.innerHTML = srcContainer.innerHTML;
+            if (battleDest) battleDest.innerHTML = srcContainer.innerHTML;
+        }
+
+        function renderEurasiaMapPreview() {
+            const pinsLayer = document.getElementById('dispMapPinsLayer');
+            if (!pinsLayer) return;
+            pinsLayer.innerHTML = '';
+            Object.keys(DISPLAY_REGIONS_META).forEach(rKey => {
+                const rNum = parseInt(rKey, 10);
+                const meta = DISPLAY_REGIONS_META[rNum];
+                const pin = document.createElement('div');
+                pin.className = 'disp-map-pin' + (rNum === 14 ? ' boss-region' : '') + (rNum === selectedPreviewRegion ? ' active' : '');
+                pin.style.left = meta.coords.x + '%';
+                pin.style.top = meta.coords.y + '%';
+                pin.textContent = rNum;
+                pin.title = `${rNum}. ${meta.name}`;
+                pin.onclick = () => {
+                    selectedPreviewRegion = rNum;
+                    renderEurasiaMapPreview();
+                    renderBattlePartyPreview(rNum);
+                };
+                pinsLayer.appendChild(pin);
+            });
+            renderMapDrawerInfo(selectedPreviewRegion);
+        }
+
+        function renderMapDrawerInfo(rNum) {
+            const drawer = document.getElementById('dispMapInfoDrawer');
+            if (!drawer) return;
+            const meta = DISPLAY_REGIONS_META[rNum];
+            const traitObj = (typeof TRAITS_DATA !== 'undefined' && TRAITS_DATA[meta.trait]) ? TRAITS_DATA[meta.trait] : null;
+            const traitName = traitObj ? traitObj.name : (rNum === 14 ? '7성 주신 네메시스 승화' : meta.trait);
+            const monsters = (typeof MONSTERS_DATABASE !== 'undefined' && MONSTERS_DATABASE[rNum]) ? MONSTERS_DATABASE[rNum] : [];
+
+            drawer.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed var(--border-wood-light); padding-bottom:8px;">
+                        <span style="font-size:1.02rem; color:var(--neon-gold);">📍 ${rNum}지역: ${meta.name}</span>
+                        <span style="font-size:0.68rem; background:#14242c; border:1px solid var(--neon-cyan); color:var(--neon-cyan); padding:2px 6px;">작전 가능</span>
+                    </div>
+                    <div style="margin-top:10px; font-size:0.78rem; color:#d6c7b2; line-height:1.4;">
+                        <strong style="color:var(--neon-cyan);">[환경]</strong> ${meta.env}
+                    </div>
+                    <div style="margin-top:8px; font-size:0.78rem;">
+                        <strong style="color:var(--neon-gold);">[발현 특성]</strong>
+                        <span style="background:#261a12; border:1px solid var(--neon-gold); color:var(--neon-gold); padding:2px 8px; margin-left:4px;">🧬 ${traitName}</span>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div style="font-size:0.76rem; color:#c8b69e; margin-bottom:6px;">👾 출현 괴수 (${monsters.length}종)</div>
+                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;">
+                            ${monsters.map(m => `
+                                <div style="background:#120d0a; border:2px solid var(--border-ink); padding:4px; text-align:center;">
+                                    <div style="width:42px; height:42px; margin:0 auto; background:url('${m.img}') no-repeat center bottom / contain; transform:scaleX(-1); image-rendering:pixelated;"></div>
+                                    <div style="font-size:0.62rem; color:${m.type==='boss'?'var(--neon-pink)':(m.type==='named'?'var(--neon-gold)':'#dfd3c3')}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${m.name}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button class="btn-test-fusion" style="flex:1; margin:0;" onclick="switchUiScene('battle')">⚔️ 이 지역 전투 화면 보기</button>
+                    <button class="btn-ctrl" onclick="switchUiScene('town')">🏪 마을로</button>
+                </div>
+            `;
+        }
+
+        function renderBattlePartyPreview(rNum) {
+            const partyBox = document.getElementById('dispBattleMonsterParty');
+            const titleEl = document.getElementById('dispBattleRegionTitle');
+            const meta = DISPLAY_REGIONS_META[rNum] || DISPLAY_REGIONS_META[1];
+            if (titleEl) titleEl.textContent = `⚔️ 지역 ${rNum}: ${meta.name}`;
+            if (!partyBox || typeof MONSTERS_DATABASE === 'undefined') return;
+            const list = MONSTERS_DATABASE[rNum] || MONSTERS_DATABASE[1];
+            const trio = [list[0], list[4], list[5]].filter(Boolean);
+            partyBox.innerHTML = trio.map((m, idx) => `
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <div style="font-size:0.68rem; color:${m.type==='boss'?'var(--neon-pink)':'#f4ece1'}; margin-bottom:2px;">${m.name}</div>
+                    <div style="width:86px; height:8px; background:#120d0a; border:2px solid var(--border-ink); margin-bottom:6px;">
+                        <div style="width:${idx===0?'65%':'100%'}; height:100%; background:var(--neon-pink);"></div>
+                    </div>
+                    <div style="width:${m.type==='boss'?'115px':'90px'}; height:${m.type==='boss'?'115px':'90px'}; background:url('${m.img}') no-repeat center bottom / contain; transform:scaleX(-1); image-rendering:pixelated;"></div>
+                </div>
+            `).join('');
+        }
+
+        function triggerDispBattleVfx(imgPath, logMsg) {
+            const box = document.getElementById('dispBattleVfxBox');
+            const logBox = document.getElementById('dispBattleLogBox');
+            if (logBox) logBox.textContent = '▶ ' + logMsg;
+            if (!box) return;
+            box.innerHTML = `<img src="${imgPath}" style="width:160px; height:160px; object-fit:contain; image-rendering:pixelated; filter:drop-shadow(0 0 14px var(--neon-cyan));">`;
+            setTimeout(() => {
+                if (box) box.innerHTML = `<img src="assets/pixel_vfx/vfx_hit_burst.png" style="width:130px; height:130px; object-fit:contain; image-rendering:pixelated;">`;
+            }, 260);
+            setTimeout(() => {
+                if (box) box.innerHTML = '';
+            }, 560);
+        }
+
+        function openUiPreviewModal(type) {
+            const overlay = document.getElementById('dispUiModalOverlay');
+            const win = document.getElementById('dispUiModalWindow');
+            if (!overlay || !win) return;
+
+            if (type === 'shop') {
+                win.innerHTML = `
+                    <div class="disp-modal-top">
+                        <h3>🏪 마을 만물 보급 상점 (Shop UI)</h3>
+                        <button class="btn-ctrl" onclick="closeUiPreviewModal()">✖ 닫기</button>
+                    </div>
+                    <div class="disp-modal-body">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-chip active">장비 구매</button>
+                                <button class="btn-chip">전리품 판매</button>
+                            </div>
+                            <span style="color:var(--neon-green); font-size:0.84rem;">보유: 1,250 Rad</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="background:#140f0c; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--border-wood); padding:10px; display:flex; gap:10px; align-items:center;">
+                                <img src="assets/ui/item_weapon.png" style="width:48px; height:48px; image-rendering:pixelated;">
+                                <div style="flex:1;">
+                                    <div style="color:var(--neon-gold); font-size:0.86rem;">고주파 흑요석 도검</div>
+                                    <div style="color:var(--neon-cyan); font-size:0.72rem;">공격력 +45 / 치명타 +10%</div>
+                                    <button class="btn-ctrl" style="margin-top:6px; width:100%; color:var(--neon-gold);">300 Rad 구매</button>
+                                </div>
+                            </div>
+                            <div style="background:#140f0c; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--border-wood); padding:10px; display:flex; gap:10px; align-items:center;">
+                                <img src="assets/ui/item_armor.png" style="width:48px; height:48px; image-rendering:pixelated;">
+                                <div style="flex:1;">
+                                    <div style="color:var(--neon-gold); font-size:0.86rem;">조선 나노 두정갑</div>
+                                    <div style="color:var(--neon-cyan); font-size:0.72rem;">방어력 +35 / 체력 +250</div>
+                                    <button class="btn-ctrl" style="margin-top:6px; width:100%; color:var(--neon-gold);">300 Rad 구매</button>
+                                </div>
+                            </div>
+                            <div style="background:#140f0c; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--border-wood); padding:10px; display:flex; gap:10px; align-items:center;">
+                                <img src="assets/ui/item_accessory.png" style="width:48px; height:48px; image-rendering:pixelated;">
+                                <div style="flex:1;">
+                                    <div style="color:var(--neon-gold); font-size:0.86rem;">도깨비불 원자로 노리개</div>
+                                    <div style="color:var(--neon-cyan); font-size:0.72rem;">특성력 +40 / 스킬 가속</div>
+                                    <button class="btn-ctrl" style="margin-top:6px; width:100%; color:var(--neon-gold);">400 Rad 구매</button>
+                                </div>
+                            </div>
+                            <div style="background:#140f0c; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--border-wood); padding:10px; display:flex; gap:10px; align-items:center;">
+                                <img src="assets/ui/item_trait_chip.png" style="width:48px; height:48px; image-rendering:pixelated;">
+                                <div style="flex:1;">
+                                    <div style="color:var(--neon-gold); font-size:0.86rem;">고대 변이 증폭 칩셋</div>
+                                    <div style="color:var(--neon-cyan); font-size:0.72rem;">모든 융합 피해 +20%</div>
+                                    <button class="btn-ctrl" style="margin-top:6px; width:100%; color:var(--neon-gold);">500 Rad 구매</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'inventory') {
+                win.innerHTML = `
+                    <div class="disp-modal-top">
+                        <h3>🎒 요원 장착 슬롯 & 20칸 전술 가방 (Inventory UI)</h3>
+                        <button class="btn-ctrl" onclick="closeUiPreviewModal()">✖ 닫기</button>
+                    </div>
+                    <div class="disp-modal-body">
+                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+                            <div style="background:#142028; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--neon-cyan); padding:10px; text-align:center;">
+                                <img src="assets/ui/item_weapon.png" style="width:36px; height:36px; image-rendering:pixelated;">
+                                <div style="font-size:0.76rem; color:var(--neon-cyan); margin-top:4px;">⚔️ 장착 무기</div>
+                            </div>
+                            <div style="background:#142028; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--neon-cyan); padding:10px; text-align:center;">
+                                <img src="assets/ui/item_armor.png" style="width:36px; height:36px; image-rendering:pixelated;">
+                                <div style="font-size:0.76rem; color:var(--neon-cyan); margin-top:4px;">🛡️ 장착 방어구</div>
+                            </div>
+                            <div style="background:#142028; border:3px solid var(--border-ink); box-shadow:inset 0 0 0 2px var(--neon-gold); padding:10px; text-align:center;">
+                                <img src="assets/ui/item_accessory.png" style="width:36px; height:36px; image-rendering:pixelated;">
+                                <div style="font-size:0.76rem; color:var(--neon-gold); margin-top:4px;">💍 특수 장신구</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.78rem; color:#d6c7b2;">📦 보유 가방 슬롯 (5x2 미리보기)</div>
+                        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;">
+                            ${[
+                                'assets/ui/item_weapon.png',
+                                'assets/ui/item_armor.png',
+                                'assets/ui/item_accessory.png',
+                                'assets/ui/item_trait_chip.png',
+                                'assets/ui/item_rad_ore.png',
+                                '', '', '', '', ''
+                            ].map(img => `
+                                <div style="height:54px; background:#100c09; border:2px solid var(--border-ink); box-shadow:inset 0 0 0 1px var(--border-wood); display:flex; align-items:center; justify-content:center;">
+                                    ${img ? `<img src="${img}" style="width:34px; height:34px; image-rendering:pixelated;">` : `<span style="font-size:0.65rem; color:#524135;">빈칸</span>`}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'stats') {
+                win.innerHTML = `
+                    <div class="disp-modal-top">
+                        <h3>📊 요원 영구 능력치 훈련소 (Stats Upgrade UI)</h3>
+                        <button class="btn-ctrl" onclick="closeUiPreviewModal()">✖ 닫기</button>
+                    </div>
+                    <div class="disp-modal-body">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="background:#120d0a; border:2px solid var(--border-ink); padding:10px; display:flex; justify-content:space-between;">
+                                <span>⚔️ 공격력 (ATK)</span><strong style="color:var(--neon-gold);">185</strong>
+                            </div>
+                            <div style="background:#120d0a; border:2px solid var(--border-ink); padding:10px; display:flex; justify-content:space-between;">
+                                <span>🛡️ 방어력 (DEF)</span><strong style="color:var(--neon-cyan);">60</strong>
+                            </div>
+                            <div style="background:#120d0a; border:2px solid var(--border-ink); padding:10px; display:flex; justify-content:space-between;">
+                                <span>🧬 특성력 (TRAIT)</span><strong style="color:var(--neon-purple);">120</strong>
+                            </div>
+                            <div style="background:#120d0a; border:2px solid var(--border-ink); padding:10px; display:flex; justify-content:space-between;">
+                                <span>❤️ 최대 체력 (HP)</span><strong style="color:var(--neon-green);">1,450</strong>
+                            </div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                            <button class="btn-test-fusion" style="margin:0;">⚔️ 공격력 연마 (100 Rad)</button>
+                            <button class="btn-test-fusion" style="margin:0;">🛡️ 방어력 연마 (100 Rad)</button>
+                            <button class="btn-test-fusion" style="margin:0;">🧬 특성력 연마 (100 Rad)</button>
+                            <button class="btn-test-fusion" style="margin:0;">❤️ 최대체력 연마 (100 Rad)</button>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'victory' || type === 'defeat') {
+                const isWin = type === 'victory';
+                win.innerHTML = `
+                    <div class="disp-modal-top">
+                        <h3>${isWin ? '🏆 CHAPTER CLEARED (승리 결산 화면)' : '💀 MISSION FAILED (패배 결산 화면)'}</h3>
+                        <button class="btn-ctrl" onclick="closeUiPreviewModal()">✖ 닫기</button>
+                    </div>
+                    <div class="disp-modal-body" style="align-items:center; text-align:center; padding:26px;">
+                        <img src="${isWin ? 'assets/ui/emblem_victory.png' : 'assets/ui/emblem_defeat.png'}" style="width:130px; height:130px; object-fit:contain; image-rendering:pixelated; filter:drop-shadow(0 0 18px ${isWin ? 'var(--neon-gold)' : 'var(--neon-pink)'});">
+                        <h2 style="margin:8px 0 4px 0; font-size:1.6rem; color:${isWin ? 'var(--neon-gold)' : 'var(--neon-pink)'}; text-shadow:3px 3px 0 #000;">
+                            ${isWin ? '🏆 작전 구역 완파 성공!' : '💀 심각한 방사능 침식 피해!'}
+                        </h2>
+                        <p style="font-size:0.84rem; color:#dfd3c3; margin:0 0 12px 0;">
+                            ${isWin ? '전투 전리품으로 +350 Rad와 신규 유전자 변이 파츠를 획득했습니다.' : '요원이 전투 불능에 빠져 생존자 마을 안전 거점으로 긴급 후송됩니다.'}
+                        </p>
+                        <button class="btn-nav-tab ${isWin ? '' : 'btn-play-game'}" onclick="closeUiPreviewModal(); switchUiScene('town');">
+                            🏪 생존자 마을로 이동
+                        </button>
+                    </div>
+                `;
+            }
+
+            overlay.classList.add('active');
+        }
+
+        function closeUiPreviewModal() {
+            const overlay = document.getElementById('dispUiModalOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function renderUiAssetsGallery() {
+            const grid = document.getElementById('uiAssetsGalleryGrid');
+            if (!grid) return;
+            grid.innerHTML = ALL_UI_ASSETS.map(item => `
+                <div class="ui-asset-card" onclick="openUiLightbox('${item.title}', '${item.path}')">
+                    <div class="ui-asset-thumb-box">
+                        <img src="${item.path}" alt="${item.title}">
+                    </div>
+                    <span class="trait-chip-cat">${item.tag}</span>
+                    <div style="font-size:0.82rem; color:var(--neon-gold); margin-top:2px;">${item.title}</div>
+                    <div style="font-size:0.66rem; color:#b8a692; margin-top:3px;">${item.path}</div>
+                </div>
+            `).join('');
+        }
+
+        function openUiLightbox(title, path) {
+            const overlay = document.getElementById('uiLightboxOverlay');
+            const titleEl = document.getElementById('uiLightboxTitle');
+            const pathEl = document.getElementById('uiLightboxPath');
+            const imgEl = document.getElementById('uiLightboxImg');
+            if (titleEl) titleEl.textContent = title;
+            if (pathEl) pathEl.textContent = path;
+            if (imgEl) imgEl.src = path;
+            if (overlay) overlay.classList.add('active');
+        }
+
+        function closeUiLightbox() {
+            const overlay = document.getElementById('uiLightboxOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // 씬 전환 탭 이벤트 연결
+            document.querySelectorAll('#uiSceneTabs .btn-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchUiScene(btn.getAttribute('data-uiscene'));
+                });
+            });
+
+            renderEurasiaMapPreview();
+            renderBattlePartyPreview(1);
+            renderUiAssetsGallery();
+
+            // 스튜디오 아바타 프레임을 마을/전투 프리뷰에도 주기적 동기화
+            setInterval(syncHeroAvatarToScenes, 150);
+        });
+    </script>
+</body>
+</html>
