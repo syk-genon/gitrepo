@@ -1,0 +1,1018 @@
+{
+  "4": {
+    "chars": 6286,
+    "continued": false,
+    "issues": []
+  },
+  "3": {
+    "chars": 8659,
+    "continued": true,
+    "issues": []
+  },
+  "2": {
+    "chars": 10036,
+    "continued": true,
+    "issues": []
+  },
+  "5": {
+    "chars": 10738,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "1": {
+    "chars": 8095,
+    "continued": true,
+    "issues": []
+  },
+  "8": {
+    "chars": 8444,
+    "continued": true,
+    "issues": []
+  },
+  "7": {
+    "chars": 8966,
+    "continued": true,
+    "issues": []
+  },
+  "9": {
+    "chars": 12729,
+    "continued": true,
+    "issues": []
+  },
+  "6": {
+    "chars": 9912,
+    "continued": true,
+    "issues": []
+  },
+  "10": {
+    "chars": 9229,
+    "continued": true,
+    "issues": []
+  },
+  "12": {
+    "chars": 10943,
+    "continued": true,
+    "issues": []
+  },
+  "13": {
+    "chars": 10227,
+    "continued": true,
+    "issues": []
+  },
+  "15": {
+    "chars": 8409,
+    "continued": true,
+    "issues": []
+  },
+  "14": {
+    "chars": 8901,
+    "continued": true,
+    "issues": []
+  },
+  "18": {
+    "chars": 5541,
+    "continued": false,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "17": {
+    "chars": 8037,
+    "continued": true,
+    "issues": []
+  },
+  "19": {
+    "chars": 8082,
+    "continued": true,
+    "issues": []
+  },
+  "21": {
+    "chars": 5481,
+    "continued": false,
+    "issues": []
+  },
+  "20": {
+    "chars": 8158,
+    "continued": true,
+    "issues": []
+  },
+  "11": {
+    "chars": 11319,
+    "continued": true,
+    "issues": []
+  },
+  "23": {
+    "chars": 8117,
+    "continued": true,
+    "issues": []
+  },
+  "25": {
+    "chars": 8373,
+    "continued": true,
+    "issues": []
+  },
+  "24": {
+    "chars": 8345,
+    "continued": true,
+    "issues": []
+  },
+  "16": {
+    "chars": 10384,
+    "continued": true,
+    "issues": []
+  },
+  "26": {
+    "chars": 7266,
+    "continued": true,
+    "issues": []
+  },
+  "28": {
+    "chars": 7741,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "27": {
+    "chars": 8926,
+    "continued": true,
+    "issues": []
+  },
+  "30": {
+    "chars": 8919,
+    "continued": true,
+    "issues": []
+  },
+  "31": {
+    "chars": 8097,
+    "continued": true,
+    "issues": []
+  },
+  "32": {
+    "chars": 8326,
+    "continued": true,
+    "issues": []
+  },
+  "34": {
+    "chars": 5379,
+    "continued": false,
+    "issues": []
+  },
+  "35": {
+    "chars": 5566,
+    "continued": false,
+    "issues": []
+  },
+  "29": {
+    "chars": 8941,
+    "continued": true,
+    "issues": []
+  },
+  "36": {
+    "chars": 8746,
+    "continued": true,
+    "issues": []
+  },
+  "22": {
+    "chars": 8830,
+    "continued": true,
+    "issues": []
+  },
+  "37": {
+    "chars": 8990,
+    "continued": true,
+    "issues": []
+  },
+  "40": {
+    "chars": 4715,
+    "continued": false,
+    "issues": []
+  },
+  "41": {
+    "chars": 6757,
+    "continued": true,
+    "issues": []
+  },
+  "39": {
+    "chars": 9068,
+    "continued": true,
+    "issues": []
+  },
+  "38": {
+    "chars": 9933,
+    "continued": true,
+    "issues": []
+  },
+  "44": {
+    "chars": 5433,
+    "continued": false,
+    "issues": []
+  },
+  "33": {
+    "chars": 9721,
+    "continued": true,
+    "issues": []
+  },
+  "45": {
+    "chars": 9251,
+    "continued": true,
+    "issues": []
+  },
+  "43": {
+    "chars": 8578,
+    "continued": true,
+    "issues": []
+  },
+  "46": {
+    "chars": 9299,
+    "continued": true,
+    "issues": []
+  },
+  "49": {
+    "chars": 4799,
+    "continued": false,
+    "issues": []
+  },
+  "42": {
+    "chars": 8743,
+    "continued": true,
+    "issues": []
+  },
+  "47": {
+    "chars": 8262,
+    "continued": true,
+    "issues": []
+  },
+  "52": {
+    "chars": 8325,
+    "continued": true,
+    "issues": []
+  },
+  "50": {
+    "chars": 8725,
+    "continued": true,
+    "issues": []
+  },
+  "53": {
+    "chars": 8371,
+    "continued": true,
+    "issues": []
+  },
+  "55": {
+    "chars": 5739,
+    "continued": false,
+    "issues": []
+  },
+  "48": {
+    "chars": 8904,
+    "continued": true,
+    "issues": []
+  },
+  "57": {
+    "chars": 6573,
+    "continued": true,
+    "issues": []
+  },
+  "56": {
+    "chars": 10032,
+    "continued": true,
+    "issues": []
+  },
+  "59": {
+    "chars": 5783,
+    "continued": false,
+    "issues": []
+  },
+  "54": {
+    "chars": 9321,
+    "continued": true,
+    "issues": []
+  },
+  "58": {
+    "chars": 8372,
+    "continued": true,
+    "issues": []
+  },
+  "62": {
+    "chars": 5546,
+    "continued": false,
+    "issues": []
+  },
+  "60": {
+    "chars": 7872,
+    "continued": true,
+    "issues": []
+  },
+  "61": {
+    "chars": 9764,
+    "continued": true,
+    "issues": []
+  },
+  "51": {
+    "chars": 10760,
+    "continued": true,
+    "issues": []
+  },
+  "63": {
+    "chars": 8314,
+    "continued": true,
+    "issues": []
+  },
+  "67": {
+    "chars": 5333,
+    "continued": false,
+    "issues": []
+  },
+  "68": {
+    "chars": 5529,
+    "continued": false,
+    "issues": []
+  },
+  "65": {
+    "chars": 7706,
+    "continued": true,
+    "issues": []
+  },
+  "64": {
+    "chars": 7435,
+    "continued": true,
+    "issues": []
+  },
+  "70": {
+    "chars": 8576,
+    "continued": true,
+    "issues": []
+  },
+  "72": {
+    "chars": 5935,
+    "continued": false,
+    "issues": []
+  },
+  "66": {
+    "chars": 10679,
+    "continued": true,
+    "issues": []
+  },
+  "74": {
+    "chars": 5396,
+    "continued": false,
+    "issues": []
+  },
+  "75": {
+    "chars": 5969,
+    "continued": false,
+    "issues": []
+  },
+  "71": {
+    "chars": 7574,
+    "continued": true,
+    "issues": []
+  },
+  "77": {
+    "chars": 5921,
+    "continued": false,
+    "issues": []
+  },
+  "78": {
+    "chars": 4965,
+    "continued": false,
+    "issues": []
+  },
+  "69": {
+    "chars": 10414,
+    "continued": true,
+    "issues": []
+  },
+  "76": {
+    "chars": 7784,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "81": {
+    "chars": 5043,
+    "continued": false,
+    "issues": []
+  },
+  "79": {
+    "chars": 7214,
+    "continued": true,
+    "issues": []
+  },
+  "73": {
+    "chars": 9089,
+    "continued": true,
+    "issues": []
+  },
+  "84": {
+    "chars": 5398,
+    "continued": false,
+    "issues": []
+  },
+  "80": {
+    "chars": 9358,
+    "continued": true,
+    "issues": []
+  },
+  "86": {
+    "chars": 5614,
+    "continued": false,
+    "issues": []
+  },
+  "87": {
+    "chars": 5512,
+    "continued": false,
+    "issues": []
+  },
+  "82": {
+    "chars": 8061,
+    "continued": true,
+    "issues": []
+  },
+  "88": {
+    "chars": 8865,
+    "continued": true,
+    "issues": []
+  },
+  "83": {
+    "chars": 9111,
+    "continued": true,
+    "issues": []
+  },
+  "85": {
+    "chars": 9103,
+    "continued": true,
+    "issues": []
+  },
+  "89": {
+    "chars": 8228,
+    "continued": true,
+    "issues": []
+  },
+  "91": {
+    "chars": 7706,
+    "continued": true,
+    "issues": []
+  },
+  "90": {
+    "chars": 10100,
+    "continued": true,
+    "issues": []
+  },
+  "93": {
+    "chars": 7943,
+    "continued": true,
+    "issues": []
+  },
+  "92": {
+    "chars": 6979,
+    "continued": true,
+    "issues": []
+  },
+  "95": {
+    "chars": 9357,
+    "continued": true,
+    "issues": []
+  },
+  "94": {
+    "chars": 9860,
+    "continued": true,
+    "issues": []
+  },
+  "98": {
+    "chars": 8776,
+    "continued": true,
+    "issues": []
+  },
+  "97": {
+    "chars": 9971,
+    "continued": true,
+    "issues": []
+  },
+  "96": {
+    "chars": 8925,
+    "continued": true,
+    "issues": []
+  },
+  "99": {
+    "chars": 7945,
+    "continued": true,
+    "issues": []
+  },
+  "100": {
+    "chars": 7577,
+    "continued": true,
+    "issues": []
+  },
+  "103": {
+    "chars": 8489,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "105": {
+    "chars": 5255,
+    "continued": false,
+    "issues": []
+  },
+  "104": {
+    "chars": 7388,
+    "continued": true,
+    "issues": []
+  },
+  "101": {
+    "chars": 9718,
+    "continued": true,
+    "issues": []
+  },
+  "102": {
+    "chars": 9078,
+    "continued": true,
+    "issues": []
+  },
+  "107": {
+    "chars": 7880,
+    "continued": true,
+    "issues": []
+  },
+  "106": {
+    "chars": 8822,
+    "continued": true,
+    "issues": []
+  },
+  "108": {
+    "chars": 9509,
+    "continued": true,
+    "issues": []
+  },
+  "110": {
+    "chars": 11368,
+    "continued": true,
+    "issues": []
+  },
+  "109": {
+    "chars": 9633,
+    "continued": true,
+    "issues": []
+  },
+  "112": {
+    "chars": 8967,
+    "continued": true,
+    "issues": []
+  },
+  "113": {
+    "chars": 9021,
+    "continued": true,
+    "issues": []
+  },
+  "116": {
+    "chars": 5365,
+    "continued": false,
+    "issues": []
+  },
+  "111": {
+    "chars": 9501,
+    "continued": true,
+    "issues": []
+  },
+  "114": {
+    "chars": 9828,
+    "continued": true,
+    "issues": []
+  },
+  "115": {
+    "chars": 8428,
+    "continued": true,
+    "issues": []
+  },
+  "117": {
+    "chars": 7476,
+    "continued": true,
+    "issues": []
+  },
+  "118": {
+    "chars": 10312,
+    "continued": true,
+    "issues": []
+  },
+  "119": {
+    "chars": 7813,
+    "continued": true,
+    "issues": []
+  },
+  "120": {
+    "chars": 8921,
+    "continued": true,
+    "issues": []
+  },
+  "121": {
+    "chars": 7396,
+    "continued": true,
+    "issues": []
+  },
+  "122": {
+    "chars": 8237,
+    "continued": true,
+    "issues": []
+  },
+  "123": {
+    "chars": 9798,
+    "continued": true,
+    "issues": []
+  },
+  "124": {
+    "chars": 11498,
+    "continued": true,
+    "issues": []
+  },
+  "126": {
+    "chars": 7866,
+    "continued": true,
+    "issues": []
+  },
+  "128": {
+    "chars": 9312,
+    "continued": true,
+    "issues": []
+  },
+  "125": {
+    "chars": 9027,
+    "continued": true,
+    "issues": []
+  },
+  "127": {
+    "chars": 8783,
+    "continued": true,
+    "issues": []
+  },
+  "129": {
+    "chars": 11016,
+    "continued": true,
+    "issues": []
+  },
+  "132": {
+    "chars": 7407,
+    "continued": true,
+    "issues": []
+  },
+  "130": {
+    "chars": 9627,
+    "continued": true,
+    "issues": []
+  },
+  "131": {
+    "chars": 7541,
+    "continued": true,
+    "issues": []
+  },
+  "134": {
+    "chars": 8108,
+    "continued": true,
+    "issues": []
+  },
+  "135": {
+    "chars": 7983,
+    "continued": true,
+    "issues": []
+  },
+  "136": {
+    "chars": 7962,
+    "continued": true,
+    "issues": []
+  },
+  "139": {
+    "chars": 6307,
+    "continued": false,
+    "issues": []
+  },
+  "140": {
+    "chars": 5638,
+    "continued": false,
+    "issues": []
+  },
+  "133": {
+    "chars": 9915,
+    "continued": true,
+    "issues": []
+  },
+  "141": {
+    "chars": 9899,
+    "continued": true,
+    "issues": []
+  },
+  "137": {
+    "chars": 10822,
+    "continued": true,
+    "issues": []
+  },
+  "138": {
+    "chars": 8879,
+    "continued": true,
+    "issues": []
+  },
+  "145": {
+    "chars": 5141,
+    "continued": false,
+    "issues": []
+  },
+  "146": {
+    "chars": 5840,
+    "continued": false,
+    "issues": []
+  },
+  "142": {
+    "chars": 9650,
+    "continued": true,
+    "issues": []
+  },
+  "143": {
+    "chars": 10193,
+    "continued": true,
+    "issues": []
+  },
+  "147": {
+    "chars": 8741,
+    "continued": true,
+    "issues": []
+  },
+  "148": {
+    "chars": 9081,
+    "continued": true,
+    "issues": []
+  },
+  "144": {
+    "chars": 9345,
+    "continued": true,
+    "issues": []
+  },
+  "149": {
+    "chars": 11871,
+    "continued": true,
+    "issues": []
+  },
+  "150": {
+    "chars": 9256,
+    "continued": true,
+    "issues": []
+  },
+  "151": {
+    "chars": 10688,
+    "continued": true,
+    "issues": []
+  },
+  "155": {
+    "chars": 8954,
+    "continued": true,
+    "issues": []
+  },
+  "156": {
+    "chars": 5125,
+    "continued": false,
+    "issues": []
+  },
+  "152": {
+    "chars": 10409,
+    "continued": true,
+    "issues": []
+  },
+  "154": {
+    "chars": 7128,
+    "continued": true,
+    "issues": []
+  },
+  "153": {
+    "chars": 8523,
+    "continued": true,
+    "issues": []
+  },
+  "157": {
+    "chars": 7657,
+    "continued": true,
+    "issues": []
+  },
+  "161": {
+    "chars": 6113,
+    "continued": false,
+    "issues": []
+  },
+  "162": {
+    "chars": 5337,
+    "continued": false,
+    "issues": []
+  },
+  "159": {
+    "chars": 8004,
+    "continued": true,
+    "issues": []
+  },
+  "158": {
+    "chars": 7704,
+    "continued": true,
+    "issues": []
+  },
+  "163": {
+    "chars": 7673,
+    "continued": true,
+    "issues": []
+  },
+  "166": {
+    "chars": 4608,
+    "continued": false,
+    "issues": []
+  },
+  "160": {
+    "chars": 8575,
+    "continued": true,
+    "issues": []
+  },
+  "165": {
+    "chars": 7729,
+    "continued": true,
+    "issues": []
+  },
+  "164": {
+    "chars": 9718,
+    "continued": true,
+    "issues": []
+  },
+  "168": {
+    "chars": 8072,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "167": {
+    "chars": 7937,
+    "continued": true,
+    "issues": []
+  },
+  "169": {
+    "chars": 8608,
+    "continued": true,
+    "issues": []
+  },
+  "171": {
+    "chars": 9990,
+    "continued": true,
+    "issues": []
+  },
+  "172": {
+    "chars": 9882,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "175": {
+    "chars": 7242,
+    "continued": true,
+    "issues": []
+  },
+  "174": {
+    "chars": 8418,
+    "continued": true,
+    "issues": []
+  },
+  "173": {
+    "chars": 11218,
+    "continued": true,
+    "issues": []
+  },
+  "176": {
+    "chars": 9211,
+    "continued": true,
+    "issues": []
+  },
+  "170": {
+    "chars": 10095,
+    "continued": true,
+    "issues": []
+  },
+  "177": {
+    "chars": 7864,
+    "continued": true,
+    "issues": []
+  },
+  "181": {
+    "chars": 4762,
+    "continued": false,
+    "issues": []
+  },
+  "182": {
+    "chars": 7935,
+    "continued": true,
+    "issues": []
+  },
+  "180": {
+    "chars": 10690,
+    "continued": true,
+    "issues": []
+  },
+  "178": {
+    "chars": 9911,
+    "continued": true,
+    "issues": []
+  },
+  "183": {
+    "chars": 9008,
+    "continued": true,
+    "issues": []
+  },
+  "184": {
+    "chars": 8436,
+    "continued": true,
+    "issues": []
+  },
+  "187": {
+    "chars": 5169,
+    "continued": false,
+    "issues": []
+  },
+  "186": {
+    "chars": 7524,
+    "continued": true,
+    "issues": []
+  },
+  "185": {
+    "chars": 9458,
+    "continued": true,
+    "issues": []
+  },
+  "188": {
+    "chars": 9282,
+    "continued": true,
+    "issues": []
+  },
+  "189": {
+    "chars": 9447,
+    "continued": true,
+    "issues": []
+  },
+  "179": {
+    "chars": 9565,
+    "continued": true,
+    "issues": []
+  },
+  "190": {
+    "chars": 9078,
+    "continued": true,
+    "issues": []
+  },
+  "191": {
+    "chars": 9767,
+    "continued": true,
+    "issues": []
+  },
+  "195": {
+    "chars": 6315,
+    "continued": false,
+    "issues": []
+  },
+  "194": {
+    "chars": 10316,
+    "continued": true,
+    "issues": []
+  },
+  "192": {
+    "chars": 8669,
+    "continued": true,
+    "issues": [
+      "hanja_paren"
+    ]
+  },
+  "193": {
+    "chars": 12061,
+    "continued": true,
+    "issues": []
+  },
+  "198": {
+    "chars": 9447,
+    "continued": true,
+    "issues": []
+  },
+  "200": {
+    "chars": 5996,
+    "continued": false,
+    "issues": []
+  },
+  "196": {
+    "chars": 11942,
+    "continued": true,
+    "issues": []
+  },
+  "199": {
+    "chars": 10118,
+    "continued": true,
+    "issues": []
+  },
+  "197": {
+    "chars": 12019,
+    "continued": true,
+    "issues": []
+  }
+}
